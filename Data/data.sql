@@ -1,0 +1,1 @@
+#suchen abspeichern und zurückgeben damit es nicht doppelt gesucht wrden muss / sq lite nutzen 

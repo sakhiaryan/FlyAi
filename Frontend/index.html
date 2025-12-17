@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlyAI - Intelligente Flugsuche</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">✈️</span>
+            <span class="logo-text">FlyAI</span>
+        </div>
+        <nav class="nav">
+            <a href="#" class="nav-link active">Flüge</a>
+            <a href="#" class="nav-link">Hotels</a>
+            <a href="#" class="nav-link">Mietwagen</a>
+        </nav>
+        <div class="header-actions">
+            <button class="btn-lang">DE 🇩🇪</button>
+            <button class="btn-login">Login</button>
+        </div>
+    </header>
+
+    <!-- Hero Section mit Suche -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Finde die besten Flugdeals</h1>
+            <p>KI-gestützte Suche • Preisvergleich • Gepäck & Visa Info</p>
+        </div>
+
+        <!-- Suchbox -->
+        <div class="search-box">
+            <!-- Trip Type -->
+            <div class="trip-type">
+                <label class="trip-option active">
+                    <input type="radio" name="trip" value="roundtrip" checked>
+                    <span>Hin & Rückflug</span>
+                </label>
+                <label class="trip-option">
+                    <input type="radio" name="trip" value="oneway">
+                    <span>Nur Hinflug</span>
+                </label>
+                <label class="trip-option">
+                    <input type="radio" name="trip" value="multi">
+                    <span>Multi-City</span>
+                </label>
+            </div>
+
+            <!-- Search Fields -->
+            <div class="search-fields">
+                <div class="field-group">
+                    <label>Von</label>
+                    <input type="text" id="from" placeholder="Berlin (BER)" class="search-input">
+                </div>
+                
+                <button class="swap-btn" onclick="swapAirports()">⇄</button>
+                
+                <div class="field-group">
+                    <label>Nach</label>
+                    <input type="text" id="to" placeholder="New York (JFK)" class="search-input">
+                </div>
+                
+                <div class="field-group">
+                    <label>Hinflug</label>
+                    <input type="date" id="departure" class="search-input">
+                </div>
+                
+                <div class="field-group">
+                    <label>Rückflug</label>
+                    <input type="date" id="return" class="search-input">
+                </div>
+                
+                <div class="field-group small">
+                    <label>Reisende</label>
+                    <select id="passengers" class="search-input">
+                        <option value="1">1 👤</option>
+                        <option value="2">2 👥</option>
+                        <option value="3">3 👥</option>
+                        <option value="4">4 👥</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="search-btn" onclick="searchFlights()">
+                🔍 Flüge suchen
+            </button>
+        </div>
+    </section>
+
+
+
+        <!-- ChatGPT-Chat -->
+    <div class="chat-container">
+    <h2>Frag die KI!</h2>
+    <div id="chat-messages" class="chat-messages"></div>
+    <div class="chat-input-row">
+        <input id="chat-input" type="text" placeholder="Deine Frage an die KI..." />
+        <button onclick="sendChat()">Senden</button>
+    </div>
+    </div>
+
+
+    <!-- Filter Bar -->
+    <section class="filters" id="filters" style="display: none;">
+        <div class="filter-container">
+            <button class="filter-btn active">Beste</button>
+            <button class="filter-btn">Günstigste</button>
+            <button class="filter-btn">Schnellste</button>
+            <div class="filter-divider"></div>
+            <button class="filter-btn">✈️ Direkt</button>
+            <button class="filter-btn">🧳 Gepäck inkl.</button>
+            <button class="filter-btn">⏰ Flexible Zeiten</button>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section class="results" id="results">
+        <!-- Wird per JavaScript gefüllt -->
+    </section>
+
+    <!-- Loading -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Durchsuche über 500 Airlines...</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

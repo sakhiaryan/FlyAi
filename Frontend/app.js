@@ -1,0 +1,286 @@
+const API_URL = 'http://127.0.0.1:8000';
+
+let selectedFrom = '';
+let selectedTo = '';
+
+// Datum-Inputs auf heute + 7 Tage setzen
+document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const twoWeeks = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+    
+    document.getElementById('departure').value = formatDate(nextWeek);
+    document.getElementById('return').value = formatDate(twoWeeks);
+    
+    // Autocomplete Setup
+    setupAutocomplete('from', 'from-dropdown', true);
+    setupAutocomplete('to', 'to-dropdown', false);
+});
+
+function formatDate(date) {
+    return date.toISOString().split('T')[0];
+}
+
+// Autocomplete Setup
+function setupAutocomplete(inputId, dropdownId, isFrom) {
+    const input = document.getElementById(inputId);
+    
+    input.addEventListener('input', async (e) => {
+        const query = e.target.value;
+        if (query.length < 2) {
+            hideDropdown(dropdownId);
+            return;
+        }
+        
+        const airports = await searchAirports(query);
+        showDropdown(dropdownId, airports, inputId, isFrom);
+    });
+    
+    input.addEventListener('focus', async () => {
+        const query = input.value;
+        if (query.length >= 2) {
+            const airports = await searchAirports(query);
+            showDropdown(dropdownId, airports, inputId, isFrom);
+        }
+    });
+    
+    // Dropdown schließen bei Klick außerhalb
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.field-group')) {
+            hideDropdown(dropdownId);
+        }
+    });
+}
+
+// Flughäfen suchen
+async function searchAirports(query) {
+    try {
+        const response = await fetch(`${API_URL}/airports?q=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        return data.airports || [];
+    } catch (error) {
+        console.error('Airport search error:', error);
+        return [];
+    }
+}
+
+// Dropdown anzeigen
+function showDropdown(dropdownId, airports, inputId, isFrom) {
+    let dropdown = document.getElementById(dropdownId);
+    
+    if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.id = dropdownId;
+        dropdown.className = 'airport-dropdown';
+        document.getElementById(inputId).parentNode.appendChild(dropdown);
+    }
+    
+    if (airports.length === 0) {
+        dropdown.innerHTML = '<div class="dropdown-item no-results">Keine Flughäfen gefunden</div>';
+    } else {
+        dropdown.innerHTML = airports.map(airport => `
+            <div class="dropdown-item" onclick="selectAirport('${inputId}', '${dropdownId}', '${airport.code}', '${airport.city}', ${isFrom})">
+                <span class="airport-icon">✈️</span>
+                <div class="airport-info">
+                    <span class="airport-city">${airport.city}</span>
+                    <span class="airport-name">${airport.name} (${airport.code})</span>
+                </div>
+                <span class="airport-country">${airport.country}</span>
+            </div>
+        `).join('');
+    }
+    
+    dropdown.style.display = 'block';
+}
+
+// Dropdown verstecken
+function hideDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+}
+
+// Flughafen auswählen
+function selectAirport(inputId, dropdownId, code, city, isFrom) {
+    const input = document.getElementById(inputId);
+    input.value = `${city} (${code})`;
+    
+    if (isFrom) {
+        selectedFrom = code;
+    } else {
+        selectedTo = code;
+    }
+    
+    hideDropdown(dropdownId);
+}
+
+// Flughäfen tauschen
+function swapAirports() {
+    const from = document.getElementById('from');
+    const to = document.getElementById('to');
+    
+    const tempValue = from.value;
+    const tempCode = selectedFrom;
+    
+    from.value = to.value;
+    selectedFrom = selectedTo;
+    
+    to.value = tempValue;
+    selectedTo = tempCode;
+}
+
+// Flugsuche
+async function searchFlights() {
+    const fromCode = selectedFrom || extractCode(document.getElementById('from').value);
+    const toCode = selectedTo || extractCode(document.getElementById('to').value);
+    const date = document.getElementById('departure').value;
+    const passengers = document.getElementById('passengers').value;
+
+    if (!fromCode || !toCode) {
+        alert('Bitte wähle Abflug- und Zielflughafen aus!');
+        return;
+    }
+
+    // Loading anzeigen
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').innerHTML = '';
+    document.getElementById('filters').style.display = 'none';
+
+    try {
+        const response = await fetch(
+            `${API_URL}/search_flights?from_airport=${fromCode}&to_airport=${toCode}&date=${date}&adults=${passengers}`
+        );
+        const data = await response.json();
+
+        document.getElementById('loading').style.display = 'none';
+        
+        if (data.success && data.flights && data.flights.length > 0) {
+            document.getElementById('filters').style.display = 'block';
+            displayFlights(data.flights);
+        } else {
+            displayError(data.error || 'Keine Flüge gefunden');
+        }
+    } catch (error) {
+        document.getElementById('loading').style.display = 'none';
+        displayError('Verbindungsfehler: ' + error.message);
+    }
+}
+
+// Code aus "Berlin (BER)" extrahieren
+function extractCode(value) {
+    const match = value.match(/\(([A-Z]{3})\)/);
+    if (match) return match[1];
+    if (value.length === 3 && value === value.toUpperCase()) return value;
+    return '';
+}
+
+// Flüge anzeigen
+function displayFlights(flights) {
+    const container = document.getElementById('results');
+    
+    container.innerHTML = flights.map(flight => {
+        const offer = flight;
+        const segment = offer.itineraries?.[0]?.segments?.[0];
+        const price = offer.price?.total || '---';
+        const currency = offer.price?.currency || 'EUR';
+        
+        const departure = segment?.departure?.iataCode || 'N/A';
+        const arrival = segment?.arrival?.iataCode || 'N/A';
+        const depTime = segment?.departure?.at?.slice(11, 16) || '--:--';
+        const arrTime = segment?.arrival?.at?.slice(11, 16) || '--:--';
+        const carrier = segment?.carrierCode || 'XX';
+        const flightNum = segment?.number || '000';
+        const duration = offer.itineraries?.[0]?.duration?.replace('PT', '').toLowerCase() || 'N/A';
+        const stops = (offer.itineraries?.[0]?.segments?.length || 1) - 1;
+        
+        return `
+            <div class="flight-card">
+                <div class="flight-info">
+                    <div class="flight-airline">
+                        <div class="airline-logo">✈️</div>
+                        <span class="airline-name">${carrier}</span>
+                        <span class="flight-number">${carrier}${flightNum}</span>
+                    </div>
+                    
+                    <div class="flight-times">
+                        <div class="departure">
+                            <div class="time">${depTime}</div>
+                            <div class="airport">${departure}</div>
+                        </div>
+                        
+                        <div class="flight-line">
+                            <div class="duration">${duration}</div>
+                            <div class="line"></div>
+                            <div class="stops ${stops === 0 ? 'direct' : ''}">${stops === 0 ? 'Direkt' : stops + ' Stop(s)'}</div>
+                        </div>
+                        
+                        <div class="arrival">
+                            <div class="time">${arrTime}</div>
+                            <div class="airport">${arrival}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flight-extras">
+                        <span class="extra">🧳 Gepäck prüfen</span>
+                        <span class="extra">💺 Economy</span>
+                    </div>
+                </div>
+                
+                <div class="flight-price">
+                    <div class="price">${price} ${currency}</div>
+                    <div class="price-note">pro Person</div>
+                    <button class="select-btn">Auswählen</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Fehler anzeigen
+function displayError(message) {
+    document.getElementById('results').innerHTML = `
+        <div class="flight-card" style="justify-content: center; text-align: center;">
+            <div>
+                <div style="font-size: 3rem; margin-bottom: 1rem;">😕</div>
+                <h3>Keine Flüge gefunden</h3>
+                <p style="color: #888; margin-top: 0.5rem;">${message}</p>
+                <p style="color: #888; margin-top: 1rem;">Tipp: Versuche Berlin → New York</p>
+            </div>
+        </div>
+    `;
+}
+
+// Trip Type Toggle
+document.querySelectorAll('.trip-option').forEach(option => {
+    option.addEventListener('click', () => {
+        document.querySelectorAll('.trip-option').forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+    });
+});
+
+
+// ChatGPT-Chat
+async function sendChat() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    appendChatMessage('Du', msg);
+    input.value = '';
+    try {
+        const res = await fetch(`${API_URL}/ask?question=${encodeURIComponent(msg)}`);
+        const data = await res.json();
+        appendChatMessage('KI', data.answer);
+    } catch (e) {
+        appendChatMessage('KI', 'Fehler beim Abrufen der Antwort.');
+    }
+}
+
+function appendChatMessage(sender, text) {
+    const chat = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.className = 'chat-msg';
+    div.innerHTML = `<b>${sender}:</b> ${text}`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
