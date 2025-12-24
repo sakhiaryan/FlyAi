@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlyAI - Intelligente Flugsuche</title>
+    <title>FlyAI - KI-gestützte Flugsuche</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -25,108 +25,105 @@
         </div>
     </header>
 
-    <!-- Hero Section mit Suche -->
+    <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-content">
-            <h1>Finde die besten Flugdeals</h1>
-            <p>KI-gestützte Suche • Preisvergleich • Gepäck & Visa Info</p>
-        </div>
+        <h1>Finde die besten Flugdeals</h1>
+        <p class="hero-sub">KI-gestützte Suche • Preisvergleich • Gepäck & Visa Info</p>
+    </section>
 
-        <!-- Suchbox -->
-        <div class="search-box">
-            <!-- Trip Type -->
-            <div class="trip-type">
-                <label class="trip-option active">
-                    <input type="radio" name="trip" value="roundtrip" checked>
-                    <span>Hin & Rückflug</span>
-                </label>
-                <label class="trip-option">
-                    <input type="radio" name="trip" value="oneway">
-                    <span>Nur Hinflug</span>
-                </label>
-                <label class="trip-option">
-                    <input type="radio" name="trip" value="multi">
-                    <span>Multi-City</span>
-                </label>
+    <!-- Main Content: Suche + Chat Sidebar -->
+    <main class="main-container">
+        
+        <!-- Linke Seite: Flugsuche -->
+        <div class="search-section">
+            <div class="search-box">
+                <div class="trip-toggle">
+                    <button class="trip-option active">Hin & Rückflug</button>
+                    <button class="trip-option">Nur Hinflug</button>
+                    <button class="trip-option">Multi-City</button>
+                </div>
+
+                <div class="search-fields">
+                    <div class="field-group">
+                        <label>Von</label>
+                        <input type="text" id="from" placeholder="Abflughafen" autocomplete="off">
+                        <div id="from-dropdown" class="airport-dropdown"></div>
+                    </div>
+
+                    <button class="swap-btn" onclick="swapAirports()">⇄</button>
+
+                    <div class="field-group">
+                        <label>Nach</label>
+                        <input type="text" id="to" placeholder="Zielflughafen" autocomplete="off">
+                        <div id="to-dropdown" class="airport-dropdown"></div>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Hinflug</label>
+                        <input type="date" id="departure">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Rückflug</label>
+                        <input type="date" id="return">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Reisende</label>
+                        <select id="passengers">
+                            <option value="1">1 👤</option>
+                            <option value="2">2 👥</option>
+                            <option value="3">3 👥</option>
+                            <option value="4">4 👥</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="search-btn" onclick="searchFlights()">
+                    <span>🔍</span> Flüge suchen
+                </button>
             </div>
 
-            <!-- Search Fields -->
-            <div class="search-fields">
-                <div class="field-group">
-                    <label>Von</label>
-                    <input type="text" id="from" placeholder="Berlin (BER)" class="search-input">
-                </div>
-                
-                <button class="swap-btn" onclick="swapAirports()">⇄</button>
-                
-                <div class="field-group">
-                    <label>Nach</label>
-                    <input type="text" id="to" placeholder="New York (JFK)" class="search-input">
-                </div>
-                
-                <div class="field-group">
-                    <label>Hinflug</label>
-                    <input type="date" id="departure" class="search-input">
-                </div>
-                
-                <div class="field-group">
-                    <label>Rückflug</label>
-                    <input type="date" id="return" class="search-input">
-                </div>
-                
-                <div class="field-group small">
-                    <label>Reisende</label>
-                    <select id="passengers" class="search-input">
-                        <option value="1">1 👤</option>
-                        <option value="2">2 👥</option>
-                        <option value="3">3 👥</option>
-                        <option value="4">4 👥</option>
-                    </select>
-                </div>
+            <!-- Loading -->
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Suche läuft...</p>
             </div>
 
-            <button class="search-btn" onclick="searchFlights()">
-                🔍 Flüge suchen
-            </button>
+            <!-- Filter -->
+            <div id="filters" class="filters" style="display: none;">
+                <span class="filter-label">Sortieren:</span>
+                <button class="filter-btn active">Beste</button>
+                <button class="filter-btn">Günstigste</button>
+                <button class="filter-btn">Schnellste</button>
+            </div>
+
+            <!-- Ergebnisse -->
+            <div id="results" class="results"></div>
         </div>
-    </section>
 
+        <!-- Rechte Seite: KI-Chat Sidebar -->
+        <aside class="chat-sidebar">
+            <div class="chat-header">
+                <span class="chat-icon">🤖</span>
+                <h3>KI-Reiseberater</h3>
+            </div>
+            <div class="chat-intro">
+                Frag mich alles über Reisen, Visa, Gepäck oder Flugempfehlungen!
+            </div>
+            <div id="chat-messages" class="chat-messages"></div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Deine Frage..." onkeypress="handleChatEnter(event)">
+                <button onclick="sendChat()" class="chat-send-btn">➤</button>
+            </div>
+        </aside>
 
+    </main>
 
-        <!-- ChatGPT-Chat -->
-    <div class="chat-container">
-    <h2>Frag die KI!</h2>
-    <div id="chat-messages" class="chat-messages"></div>
-    <div class="chat-input-row">
-        <input id="chat-input" type="text" placeholder="Deine Frage an die KI..." />
-        <button onclick="sendChat()">Senden</button>
-    </div>
-    </div>
-
-
-    <!-- Filter Bar -->
-    <section class="filters" id="filters" style="display: none;">
-        <div class="filter-container">
-            <button class="filter-btn active">Beste</button>
-            <button class="filter-btn">Günstigste</button>
-            <button class="filter-btn">Schnellste</button>
-            <div class="filter-divider"></div>
-            <button class="filter-btn">✈️ Direkt</button>
-            <button class="filter-btn">🧳 Gepäck inkl.</button>
-            <button class="filter-btn">⏰ Flexible Zeiten</button>
-        </div>
-    </section>
-
-    <!-- Results -->
-    <section class="results" id="results">
-        <!-- Wird per JavaScript gefüllt -->
-    </section>
-
-    <!-- Loading -->
-    <div class="loading" id="loading" style="display: none;">
-        <div class="spinner"></div>
-        <p>Durchsuche über 500 Airlines...</p>
-    </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2025 FlyAI – Deine KI-gestützte Flugsuche</p>
+    </footer>
 
     <script src="app.js"></script>
 </body>

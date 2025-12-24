@@ -1,3 +1,6 @@
 fastapi
 uvicorn
+sqlmodel
+amadeus
 openai
+python-dotenv
