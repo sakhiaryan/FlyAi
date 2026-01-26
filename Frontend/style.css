@@ -357,7 +357,7 @@ body {
     border-radius: var(--radius-xl);
     padding: 0;
     box-shadow: var(--shadow-lg);
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid var(--border-dark);
 }
 
@@ -1735,6 +1735,10 @@ body {
     color: var(--primary);
     font-size: 0.75rem;
     transition: all 0.2s ease;
+}
+
+.passenger-controls button i {
+    pointer-events: none;
 }
 
 .passenger-controls button:hover:not(:disabled) {

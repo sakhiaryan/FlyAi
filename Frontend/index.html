@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlyAI - KI-gestützte Flugsuche</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -159,7 +159,7 @@
                                 Reisende
                             </label>
                             <div class="passengers-selector">
-                                <button type="button" class="passengers-btn" onclick="togglePassengerPopup()">
+                                <button type="button" class="passengers-btn" id="passengers-btn">
                                     <span id="passengers-display">1 Erwachsener</span>
                                     <i class="fa-solid fa-chevron-down"></i>
                                 </button>
@@ -170,9 +170,9 @@
                                             <span class="passenger-age">Ab 12 Jahren</span>
                                         </div>
                                         <div class="passenger-controls">
-                                            <button type="button" onclick="changePassengers('adults', -1)"><i class="fa-solid fa-minus"></i></button>
+                                            <button type="button" id="adults-minus" class="passenger-btn-ctrl"><i class="fa-solid fa-minus"></i></button>
                                             <span id="adults-count">1</span>
-                                            <button type="button" onclick="changePassengers('adults', 1)"><i class="fa-solid fa-plus"></i></button>
+                                            <button type="button" id="adults-plus" class="passenger-btn-ctrl"><i class="fa-solid fa-plus"></i></button>
                                         </div>
                                     </div>
                                     <div class="passenger-row">
@@ -181,9 +181,9 @@
                                             <span class="passenger-age">2-11 Jahre</span>
                                         </div>
                                         <div class="passenger-controls">
-                                            <button type="button" onclick="changePassengers('children', -1)"><i class="fa-solid fa-minus"></i></button>
+                                            <button type="button" id="children-minus" class="passenger-btn-ctrl"><i class="fa-solid fa-minus"></i></button>
                                             <span id="children-count">0</span>
-                                            <button type="button" onclick="changePassengers('children', 1)"><i class="fa-solid fa-plus"></i></button>
+                                            <button type="button" id="children-plus" class="passenger-btn-ctrl"><i class="fa-solid fa-plus"></i></button>
                                         </div>
                                     </div>
                                     <div class="passenger-row">
@@ -192,9 +192,9 @@
                                             <span class="passenger-age">Unter 2 Jahren</span>
                                         </div>
                                         <div class="passenger-controls">
-                                            <button type="button" onclick="changePassengers('infants', -1)"><i class="fa-solid fa-minus"></i></button>
+                                            <button type="button" id="infants-minus" class="passenger-btn-ctrl"><i class="fa-solid fa-minus"></i></button>
                                             <span id="infants-count">0</span>
-                                            <button type="button" onclick="changePassengers('infants', 1)"><i class="fa-solid fa-plus"></i></button>
+                                            <button type="button" id="infants-plus" class="passenger-btn-ctrl"><i class="fa-solid fa-plus"></i></button>
                                         </div>
                                     </div>
                                     <button type="button" class="passengers-done-btn" onclick="closePassengerPopup()">Fertig</button>
@@ -314,6 +314,6 @@
         </div>
     </footer>
 
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=12"></script>
 </body>
 </html>

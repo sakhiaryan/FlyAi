@@ -528,23 +528,71 @@ function clearChatHistory() {
 }
 
 // ==================== PASSENGERS SELECTOR ====================
+// Setup passengers button click handler
+document.addEventListener('DOMContentLoaded', () => {
+    const passengersBtn = document.getElementById('passengers-btn');
+    if (passengersBtn) {
+        passengersBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            togglePassengerPopup();
+        });
+    }
+
+    // Setup +/- buttons
+    const buttonConfig = [
+        { id: 'adults-minus', type: 'adults', delta: -1 },
+        { id: 'adults-plus', type: 'adults', delta: 1 },
+        { id: 'children-minus', type: 'children', delta: -1 },
+        { id: 'children-plus', type: 'children', delta: 1 },
+        { id: 'infants-minus', type: 'infants', delta: -1 },
+        { id: 'infants-plus', type: 'infants', delta: 1 }
+    ];
+
+    buttonConfig.forEach(config => {
+        const btn = document.getElementById(config.id);
+        if (btn) {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                changePassengers(config.type, config.delta);
+            });
+        }
+    });
+});
+
 function togglePassengerPopup() {
     const popup = document.getElementById('passengers-popup');
-    const btn = document.querySelector('.passengers-btn');
+    const btn = document.getElementById('passengers-btn');
+
+    if (!popup || !btn) return;
 
     if (popup.classList.contains('show')) {
         closePassengerPopup();
     } else {
         popup.classList.add('show');
         btn.classList.add('open');
+        // Add click listener to close when clicking outside
+        setTimeout(() => {
+            document.addEventListener('click', handleOutsideClick);
+        }, 10);
+    }
+}
+
+function handleOutsideClick(e) {
+    const popup = document.getElementById('passengers-popup');
+    const selector = document.querySelector('.passengers-selector');
+
+    if (popup && selector && !selector.contains(e.target)) {
+        closePassengerPopup();
     }
 }
 
 function closePassengerPopup() {
     const popup = document.getElementById('passengers-popup');
-    const btn = document.querySelector('.passengers-btn');
-    popup.classList.remove('show');
-    btn.classList.remove('open');
+    const btn = document.getElementById('passengers-btn');
+    if (popup) popup.classList.remove('show');
+    if (btn) btn.classList.remove('open');
+    document.removeEventListener('click', handleOutsideClick);
 }
 
 function changePassengers(type, delta) {
@@ -595,37 +643,18 @@ function updatePassengerDisplay() {
 }
 
 function updatePassengerButtons() {
-    // Adults minus button
-    const adultMinus = document.querySelector('[onclick="changePassengers(\'adults\', -1)"]');
-    adultMinus.disabled = passengers.adults <= 1;
+    const adultMinus = document.getElementById('adults-minus');
+    const adultPlus = document.getElementById('adults-plus');
+    const childMinus = document.getElementById('children-minus');
+    const childPlus = document.getElementById('children-plus');
+    const infantMinus = document.getElementById('infants-minus');
+    const infantPlus = document.getElementById('infants-plus');
 
-    // Adults plus button
-    const adultPlus = document.querySelector('[onclick="changePassengers(\'adults\', 1)"]');
-    adultPlus.disabled = passengers.adults >= 9 || (passengers.adults + passengers.children) >= 9;
-
-    // Children minus button
-    const childMinus = document.querySelector('[onclick="changePassengers(\'children\', -1)"]');
-    childMinus.disabled = passengers.children <= 0;
-
-    // Children plus button
-    const childPlus = document.querySelector('[onclick="changePassengers(\'children\', 1)"]');
-    childPlus.disabled = passengers.children >= 9 || (passengers.adults + passengers.children) >= 9;
-
-    // Infants minus button
-    const infantMinus = document.querySelector('[onclick="changePassengers(\'infants\', -1)"]');
-    infantMinus.disabled = passengers.infants <= 0;
-
-    // Infants plus button (max = number of adults)
-    const infantPlus = document.querySelector('[onclick="changePassengers(\'infants\', 1)"]');
-    infantPlus.disabled = passengers.infants >= passengers.adults;
+    if (adultMinus) adultMinus.disabled = passengers.adults <= 1;
+    if (adultPlus) adultPlus.disabled = passengers.adults >= 9 || (passengers.adults + passengers.children) >= 9;
+    if (childMinus) childMinus.disabled = passengers.children <= 0;
+    if (childPlus) childPlus.disabled = passengers.children >= 9 || (passengers.adults + passengers.children) >= 9;
+    if (infantMinus) infantMinus.disabled = passengers.infants <= 0;
+    if (infantPlus) infantPlus.disabled = passengers.infants >= passengers.adults;
 }
 
-// Close popup when clicking outside
-document.addEventListener('click', (e) => {
-    const popup = document.getElementById('passengers-popup');
-    const selector = document.querySelector('.passengers-selector');
-
-    if (popup && selector && !selector.contains(e.target)) {
-        closePassengerPopup();
-    }
-});
