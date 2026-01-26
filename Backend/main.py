@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import json
 import re
+import asyncio
 
 # .env laden
 load_dotenv()
@@ -28,6 +29,7 @@ def create_db_and_tables():
 from services.amadeus_service import search_flights_amadeus
 from services.airport_service import search_airports
 from services.openai_service import ask_chatgpt, ask_chatgpt_with_history
+from services.auswaertiges_amt_service import fetch_travel_info, format_aa_info_for_chat, get_country_slug
 
 # Models importieren
 from models.search_history import SearchHistory
@@ -96,7 +98,7 @@ def get_search_history(request: Request):
 
 @app.post("/chat")
 @limiter.limit("20/minute")
-def chat_with_history(request: Request, chat_request: ChatRequest):
+async def chat_with_history(request: Request, chat_request: ChatRequest):
     """Chat MIT Konversations-History - der Bot merkt sich alles!"""
 
     # Konvertiere zu OpenAI Format
@@ -105,13 +107,15 @@ def chat_with_history(request: Request, chat_request: ChatRequest):
     # Aktuelle Frage hinzufügen
     messages.append({"role": "user", "content": chat_request.question})
 
+    question_lower = chat_request.question.lower()
+
     # Prüfe ob es eine Flugsuche-Anfrage ist
     flight_keywords = ["flug", "fliegen", "flüge", "flight", "buchen", "ticket"]
-    is_flight_query = any(kw in chat_request.question.lower() for kw in flight_keywords)
+    is_flight_query = any(kw in question_lower for kw in flight_keywords)
 
     # Prüfe auf Ziel-Anfragen wie "ich will nach X"
     destination_pattern = r"(?:nach|to|towards)\s+([A-Za-zäöüÄÖÜß\s]+?)(?:\s+fliegen|\s+reisen|$)"
-    destination_match = re.search(destination_pattern, chat_request.question.lower())
+    destination_match = re.search(destination_pattern, question_lower)
 
     if is_flight_query or destination_match:
         # Extrahiere Flugdaten mit KI
@@ -141,6 +145,39 @@ Wenn keine klare Flugsuche, antworte:
                     }
         except:
             pass
+
+    # Prüfe ob es eine Visa/Reise/Sicherheitsfrage ist
+    travel_keywords = ["visum", "visa", "einreise", "reisewarnung", "sicherheit", "gefährlich",
+                       "reisehinweis", "brauche ich", "reisepass", "impfung", "corona", "covid"]
+    is_travel_query = any(kw in question_lower for kw in travel_keywords)
+
+    # Extrahiere Land aus der Frage
+    country_pattern = r"(?:nach|für|in|für)\s+([A-Za-zäöüÄÖÜß\s]+?)(?:\s+reisen|\s+fliegen|\?|$|,|\s+brauche|\s+ein)"
+    country_match = re.search(country_pattern, question_lower)
+
+    aa_context = ""
+
+    if is_travel_query and country_match:
+        country = country_match.group(1).strip()
+        # Prüfe ob wir das Land kennen
+        if get_country_slug(country):
+            try:
+                # Hole aktuelle Infos vom Auswärtigen Amt
+                aa_info = await fetch_travel_info(country)
+                aa_context = format_aa_info_for_chat(aa_info)
+            except Exception as e:
+                print(f"AA-Fetch Fehler: {e}")
+
+    # Wenn wir AA-Kontext haben, füge ihn zur Anfrage hinzu
+    if aa_context:
+        enhanced_question = f"""{chat_request.question}
+
+--- AKTUELLE INFOS VOM AUSWÄRTIGEN AMT (Stand heute) ---
+{aa_context}
+---
+Nutze diese offiziellen Infos für deine Antwort und erwähne die Quelle (Auswärtiges Amt)."""
+
+        messages[-1] = {"role": "user", "content": enhanced_question}
 
     # Normale Chat-Antwort mit History
     answer = ask_chatgpt_with_history(messages)

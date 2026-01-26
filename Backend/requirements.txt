@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+openai
+amadeus
+sqlmodel
+slowapi
+httpx
+beautifulsoup4
