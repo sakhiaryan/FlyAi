@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlyAI - Mietwagen finden</title>
+    <link rel="stylesheet" href="style.css?v=3">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-decoration">
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+        <div class="bg-circle bg-circle-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-plane"></i>
+                </div>
+                <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">
+                    <i class="fa-solid fa-plane-departure"></i>
+                    <span>Flüge</span>
+                </a>
+                <a href="hotels.html" class="nav-link">
+                    <i class="fa-solid fa-hotel"></i>
+                    <span>Hotels</span>
+                </a>
+                <a href="mietwagen.html" class="nav-link active">
+                    <i class="fa-solid fa-car"></i>
+                    <span>Mietwagen</span>
+                </a>
+                <a href="aktivitaeten.html" class="nav-link">
+                    <i class="fa-solid fa-ticket"></i>
+                    <span>Aktivitäten</span>
+                </a>
+            </nav>
+            <div class="header-actions">
+                <button class="btn-lang">
+                    <span class="flag">🇩🇪</span>
+                    <span>DE</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <button class="btn-login">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Anmelden</span>
+                </button>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>Flexible Mobilität</span>
+            </div>
+            <h1>Finde deinen <span class="gradient-text">Mietwagen</span></h1>
+            <p class="hero-sub">Vergleiche Mietwagen von allen großen Anbietern. Von Kleinwagen bis SUV - flexibel und günstig.</p>
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <span>Keine Kreditkarte nötig</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Vollkasko inklusive</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fa-solid fa-road"></i>
+                    <span>Unbegrenzte Kilometer</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="search-section">
+            <div class="search-box">
+                <div class="search-box-header">
+                    <h2><i class="fa-solid fa-car"></i> Mietwagen suchen</h2>
+                </div>
+
+                <div class="trip-toggle">
+                    <button class="trip-option active">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>Gleiche Rückgabe</span>
+                    </button>
+                    <button class="trip-option">
+                        <i class="fa-solid fa-route"></i>
+                        <span>Andere Rückgabe</span>
+                    </button>
+                </div>
+
+                <div class="search-fields">
+                    <div class="field-row">
+                        <div class="field-group" style="flex: 2;">
+                            <label>
+                                <i class="fa-solid fa-location-dot"></i>
+                                Abholort
+                            </label>
+                            <input type="text" id="pickup-location" placeholder="Flughafen, Stadt oder Adresse" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label>
+                                <i class="fa-regular fa-calendar"></i>
+                                Abholung
+                            </label>
+                            <input type="date" id="pickup-date">
+                        </div>
+
+                        <div class="field-group">
+                            <label>
+                                <i class="fa-solid fa-clock"></i>
+                                Uhrzeit
+                            </label>
+                            <select id="pickup-time">
+                                <option value="09:00">09:00</option>
+                                <option value="10:00" selected>10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:00">18:00</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label>
+                                <i class="fa-regular fa-calendar-check"></i>
+                                Rückgabe
+                            </label>
+                            <input type="date" id="return-date">
+                        </div>
+
+                        <div class="field-group">
+                            <label>
+                                <i class="fa-solid fa-clock"></i>
+                                Uhrzeit
+                            </label>
+                            <select id="return-time">
+                                <option value="09:00">09:00</option>
+                                <option value="10:00" selected>10:00</option>
+                                <option value="11:00">11:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="13:00">13:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="15:00">15:00</option>
+                                <option value="16:00">16:00</option>
+                                <option value="17:00">17:00</option>
+                                <option value="18:00">18:00</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label>
+                                <i class="fa-solid fa-user"></i>
+                                Fahreralter
+                            </label>
+                            <select id="driver-age">
+                                <option value="25+">25+</option>
+                                <option value="21-24">21-24</option>
+                                <option value="18-20">18-20</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label>
+                                <i class="fa-solid fa-car-side"></i>
+                                Fahrzeugklasse
+                            </label>
+                            <select id="car-class">
+                                <option value="all">Alle Klassen</option>
+                                <option value="small">Kleinwagen</option>
+                                <option value="compact">Kompakt</option>
+                                <option value="medium">Mittelklasse</option>
+                                <option value="suv">SUV</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="search-btn" onclick="searchCars()">
+                    <i class="fa-solid fa-search"></i>
+                    <span>Mietwagen suchen</span>
+                    <div class="btn-shine"></div>
+                </button>
+            </div>
+
+            <!-- Coming Soon -->
+            <div class="coming-soon-card">
+                <div class="coming-soon-icon">
+                    <i class="fa-solid fa-car"></i>
+                </div>
+                <h3>Mietwagen-Suche kommt bald!</h3>
+                <p>Wir integrieren gerade die besten Mietwagen-Anbieter. Bald kannst du hier günstige Mietwagen finden.</p>
+                <div class="coming-soon-features">
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Alle großen Anbieter</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Keine versteckten Kosten</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Kostenlose Stornierung</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: AI Chat Sidebar -->
+        <aside class="chat-sidebar">
+            <div class="chat-header">
+                <div class="chat-header-icon">
+                    <i class="fa-solid fa-robot"></i>
+                    <span class="online-dot"></span>
+                </div>
+                <div class="chat-header-info">
+                    <h3>KI-Reiseberater</h3>
+                    <span class="chat-status">Online & bereit zu helfen</span>
+                </div>
+            </div>
+            <div class="chat-intro">
+                <div class="intro-icon">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <p>Ich helfe dir beim Mietwagen! Frag mich nach:</p>
+                <div class="intro-tags">
+                    <span class="intro-tag"><i class="fa-solid fa-car"></i> Mietwagen</span>
+                    <span class="intro-tag"><i class="fa-solid fa-road"></i> Routen</span>
+                    <span class="intro-tag"><i class="fa-solid fa-gas-pump"></i> Tankstellen</span>
+                    <span class="intro-tag"><i class="fa-solid fa-lightbulb"></i> Tipps</span>
+                </div>
+            </div>
+            <div id="chat-messages" class="chat-messages"></div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Schreibe eine Nachricht..." onkeypress="handleChatEnter(event)">
+                <button onclick="sendChat()" class="chat-send-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+                    <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
+                </div>
+                <p>Deine intelligente Reiseplattform</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">Über uns</a>
+                <a href="#">Datenschutz</a>
+                <a href="#">Impressum</a>
+                <a href="#">Kontakt</a>
+            </div>
+            <div class="footer-social">
+                <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 FlyAI – Mit <i class="fa-solid fa-heart"></i> entwickelt</p>
+        </div>
+    </footer>
+
+    <script src="app.js?v=7"></script>
+    <script>
+        // Datum-Inputs setzen
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const returnDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+            document.getElementById('pickup-date').value = formatDateLocal(nextWeek);
+            document.getElementById('return-date').value = formatDateLocal(returnDate);
+
+            // Trip toggle
+            document.querySelectorAll('.trip-option').forEach((option, index) => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.trip-option').forEach(o => o.classList.remove('active'));
+                    option.classList.add('active');
+                    if (index === 1) {
+                        showToast('Andere Rückgabestation wird bald verfügbar!', 'info');
+                    }
+                });
+            });
+        });
+
+        function formatDateLocal(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function searchCars() {
+            showToast('Mietwagen-Suche wird bald verfügbar sein!', 'info');
+        }
+    </script>
+</body>
+</html>

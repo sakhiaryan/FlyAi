@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlyAI - KI-gestützte Flugsuche</title>
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -26,17 +26,21 @@
                 <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
             </div>
             <nav class="nav">
-                <a href="#" class="nav-link active">
+                <a href="index.html" class="nav-link active">
                     <i class="fa-solid fa-plane-departure"></i>
                     <span>Flüge</span>
                 </a>
-                <a href="#" class="nav-link">
+                <a href="hotels.html" class="nav-link">
                     <i class="fa-solid fa-hotel"></i>
                     <span>Hotels</span>
                 </a>
-                <a href="#" class="nav-link">
+                <a href="mietwagen.html" class="nav-link">
                     <i class="fa-solid fa-car"></i>
                     <span>Mietwagen</span>
+                </a>
+                <a href="aktivitaeten.html" class="nav-link">
+                    <i class="fa-solid fa-ticket"></i>
+                    <span>Aktivitäten</span>
                 </a>
             </nav>
             <div class="header-actions">
@@ -154,12 +158,48 @@
                                 <i class="fa-solid fa-users"></i>
                                 Reisende
                             </label>
-                            <select id="passengers">
-                                <option value="1">1 Erwachsener</option>
-                                <option value="2">2 Erwachsene</option>
-                                <option value="3">3 Erwachsene</option>
-                                <option value="4">4 Erwachsene</option>
-                            </select>
+                            <div class="passengers-selector">
+                                <button type="button" class="passengers-btn" onclick="togglePassengerPopup()">
+                                    <span id="passengers-display">1 Erwachsener</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+                                <div id="passengers-popup" class="passengers-popup">
+                                    <div class="passenger-row">
+                                        <div class="passenger-info">
+                                            <span class="passenger-type">Erwachsene</span>
+                                            <span class="passenger-age">Ab 12 Jahren</span>
+                                        </div>
+                                        <div class="passenger-controls">
+                                            <button type="button" onclick="changePassengers('adults', -1)"><i class="fa-solid fa-minus"></i></button>
+                                            <span id="adults-count">1</span>
+                                            <button type="button" onclick="changePassengers('adults', 1)"><i class="fa-solid fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="passenger-row">
+                                        <div class="passenger-info">
+                                            <span class="passenger-type">Kinder</span>
+                                            <span class="passenger-age">2-11 Jahre</span>
+                                        </div>
+                                        <div class="passenger-controls">
+                                            <button type="button" onclick="changePassengers('children', -1)"><i class="fa-solid fa-minus"></i></button>
+                                            <span id="children-count">0</span>
+                                            <button type="button" onclick="changePassengers('children', 1)"><i class="fa-solid fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="passenger-row">
+                                        <div class="passenger-info">
+                                            <span class="passenger-type">Kleinkinder</span>
+                                            <span class="passenger-age">Unter 2 Jahren</span>
+                                        </div>
+                                        <div class="passenger-controls">
+                                            <button type="button" onclick="changePassengers('infants', -1)"><i class="fa-solid fa-minus"></i></button>
+                                            <span id="infants-count">0</span>
+                                            <button type="button" onclick="changePassengers('infants', 1)"><i class="fa-solid fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="passengers-done-btn" onclick="closePassengerPopup()">Fertig</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -274,6 +314,6 @@
         </div>
     </footer>
 
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=7"></script>
 </body>
 </html>

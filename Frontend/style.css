@@ -1620,3 +1620,284 @@ body {
 .flight-card .select-btn i {
     font-size: 0.8rem;
 }
+
+/* ========== PASSENGERS SELECTOR ========== */
+.passengers-selector {
+    position: relative;
+}
+
+.passengers-btn {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: white;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+}
+
+.passengers-btn:hover {
+    border-color: var(--primary-light);
+}
+
+.passengers-btn:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.passengers-btn i {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+}
+
+.passengers-btn.open i {
+    transform: rotate(180deg);
+}
+
+.passengers-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    padding: 1rem;
+    display: none;
+}
+
+.passengers-popup.show {
+    display: block;
+    animation: popupIn 0.2s ease;
+}
+
+@keyframes popupIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.passenger-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.passenger-row:last-of-type {
+    border-bottom: none;
+}
+
+.passenger-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.passenger-type {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.passenger-age {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.passenger-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.passenger-controls button {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #e2e8f0;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.passenger-controls button:hover:not(:disabled) {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.passenger-controls button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.passenger-controls span {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.passengers-done-btn {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.passengers-done-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* ========== COMING SOON CARD ========== */
+.coming-soon-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-top: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.coming-soon-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    animation: pulse 2s infinite;
+}
+
+.coming-soon-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.coming-soon-card h3 {
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.coming-soon-card p {
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.6;
+}
+
+.coming-soon-features {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.feature-item i {
+    color: #10b981;
+    font-size: 0.9rem;
+}
+
+/* ========== ACTIVITY CATEGORIES ========== */
+.activity-categories {
+    margin-top: 1.5rem;
+}
+
+.activity-categories h3 {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.category-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.category-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-md);
+}
+
+.category-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+}
+
+.category-icon i {
+    font-size: 1.3rem;
+    color: var(--primary);
+}
+
+.category-card span {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .coming-soon-features {
+        flex-direction: column;
+        align-items: center;
+    }
+}

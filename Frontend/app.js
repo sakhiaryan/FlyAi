@@ -5,6 +5,13 @@ let selectedTo = '';
 let tripType = 'roundtrip'; // 'roundtrip', 'oneway', 'multicity'
 let currentFlights = []; // Speichert aktuelle Suchergebnisse
 
+// Passagiere
+let passengers = {
+    adults: 1,
+    children: 0,
+    infants: 0
+};
+
 // Chat-History speichern (global für Debugging)
 window.chatHistory = [];
 
@@ -168,10 +175,10 @@ async function searchFlights() {
     const fromCode = selectedFrom || extractCode(document.getElementById('from').value);
     const toCode = selectedTo || extractCode(document.getElementById('to').value);
     const date = document.getElementById('departure').value;
-    const passengers = document.getElementById('passengers').value;
+    const adults = passengers.adults;
 
     if (!fromCode || !toCode) {
-        alert('Bitte wähle Abflug- und Zielflughafen aus!');
+        showToast('Bitte wähle Abflug- und Zielflughafen aus!', 'error');
         return;
     }
 
@@ -181,7 +188,7 @@ async function searchFlights() {
 
     try {
         const response = await fetch(
-            `${API_URL}/search_flights?from_airport=${fromCode}&to_airport=${toCode}&date=${date}&adults=${passengers}`
+            `${API_URL}/search_flights?from_airport=${fromCode}&to_airport=${toCode}&date=${date}&adults=${adults}`
         );
         const data = await response.json();
 
@@ -519,3 +526,106 @@ function clearChatHistory() {
     window.chatHistory = [];
     document.getElementById('chat-messages').innerHTML = '';
 }
+
+// ==================== PASSENGERS SELECTOR ====================
+function togglePassengerPopup() {
+    const popup = document.getElementById('passengers-popup');
+    const btn = document.querySelector('.passengers-btn');
+
+    if (popup.classList.contains('show')) {
+        closePassengerPopup();
+    } else {
+        popup.classList.add('show');
+        btn.classList.add('open');
+    }
+}
+
+function closePassengerPopup() {
+    const popup = document.getElementById('passengers-popup');
+    const btn = document.querySelector('.passengers-btn');
+    popup.classList.remove('show');
+    btn.classList.remove('open');
+}
+
+function changePassengers(type, delta) {
+    const newValue = passengers[type] + delta;
+
+    // Validierung
+    if (type === 'adults' && (newValue < 1 || newValue > 9)) return;
+    if (type === 'children' && (newValue < 0 || newValue > 9)) return;
+    if (type === 'infants' && (newValue < 0 || newValue > passengers.adults)) return;
+
+    // Gesamtanzahl prüfen (max 9 Passagiere)
+    const total = (type === 'adults' ? newValue : passengers.adults) +
+                  (type === 'children' ? newValue : passengers.children);
+    if (total > 9) return;
+
+    passengers[type] = newValue;
+    updatePassengerDisplay();
+    updatePassengerButtons();
+}
+
+function updatePassengerDisplay() {
+    const display = document.getElementById('passengers-display');
+    const total = passengers.adults + passengers.children;
+
+    let text = '';
+    if (passengers.adults === 1 && passengers.children === 0 && passengers.infants === 0) {
+        text = '1 Erwachsener';
+    } else {
+        const parts = [];
+        if (passengers.adults > 0) {
+            parts.push(`${passengers.adults} Erw.`);
+        }
+        if (passengers.children > 0) {
+            parts.push(`${passengers.children} Kind${passengers.children > 1 ? 'er' : ''}`);
+        }
+        if (passengers.infants > 0) {
+            parts.push(`${passengers.infants} Baby${passengers.infants > 1 ? 's' : ''}`);
+        }
+        text = parts.join(', ');
+    }
+
+    display.textContent = text;
+
+    // Update count displays
+    document.getElementById('adults-count').textContent = passengers.adults;
+    document.getElementById('children-count').textContent = passengers.children;
+    document.getElementById('infants-count').textContent = passengers.infants;
+}
+
+function updatePassengerButtons() {
+    // Adults minus button
+    const adultMinus = document.querySelector('[onclick="changePassengers(\'adults\', -1)"]');
+    adultMinus.disabled = passengers.adults <= 1;
+
+    // Adults plus button
+    const adultPlus = document.querySelector('[onclick="changePassengers(\'adults\', 1)"]');
+    adultPlus.disabled = passengers.adults >= 9 || (passengers.adults + passengers.children) >= 9;
+
+    // Children minus button
+    const childMinus = document.querySelector('[onclick="changePassengers(\'children\', -1)"]');
+    childMinus.disabled = passengers.children <= 0;
+
+    // Children plus button
+    const childPlus = document.querySelector('[onclick="changePassengers(\'children\', 1)"]');
+    childPlus.disabled = passengers.children >= 9 || (passengers.adults + passengers.children) >= 9;
+
+    // Infants minus button
+    const infantMinus = document.querySelector('[onclick="changePassengers(\'infants\', -1)"]');
+    infantMinus.disabled = passengers.infants <= 0;
+
+    // Infants plus button (max = number of adults)
+    const infantPlus = document.querySelector('[onclick="changePassengers(\'infants\', 1)"]');
+    infantPlus.disabled = passengers.infants >= passengers.adults;
+}
+
+// Close popup when clicking outside
+document.addEventListener('click', (e) => {
+    const popup = document.getElementById('passengers-popup');
+    const selector = document.querySelector('.passengers-selector');
+
+    if (popup && selector && !selector.contains(e.target)) {
+        closePassengerPopup();
+    }
+});
