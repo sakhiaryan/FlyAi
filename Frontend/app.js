@@ -3,18 +3,46 @@ const API_URL = 'http://127.0.0.1:8000';
 let selectedFrom = '';
 let selectedTo = '';
 
+// Chat-History speichern (global für Debugging)
+window.chatHistory = [];
+
+// Rate Limiter: Max 10 Nachrichten pro Minute
+const rateLimiter = {
+    messages: [],
+    maxMessages: 10,
+    timeWindow: 60000, // 1 Minute in ms
+
+    canSend() {
+        const now = Date.now();
+        // Alte Nachrichten entfernen
+        this.messages = this.messages.filter(t => now - t < this.timeWindow);
+        return this.messages.length < this.maxMessages;
+    },
+
+    recordMessage() {
+        this.messages.push(Date.now());
+    },
+
+    getWaitTime() {
+        if (this.messages.length === 0) return 0;
+        const oldest = this.messages[0];
+        const waitMs = this.timeWindow - (Date.now() - oldest);
+        return Math.ceil(waitMs / 1000);
+    }
+};
+
 // Datum-Inputs auf heute + 7 Tage setzen
 document.addEventListener('DOMContentLoaded', () => {
     const today = new Date();
     const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
     const twoWeeks = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
-    
+
     document.getElementById('departure').value = formatDate(nextWeek);
     document.getElementById('return').value = formatDate(twoWeeks);
-    
+
     setupAutocomplete('from', 'from-dropdown', true);
     setupAutocomplete('to', 'to-dropdown', false);
-    
+
     document.querySelectorAll('.trip-option').forEach(option => {
         option.addEventListener('click', () => {
             document.querySelectorAll('.trip-option').forEach(o => o.classList.remove('active'));
@@ -30,7 +58,7 @@ function formatDate(date) {
 // ==================== AUTOCOMPLETE ====================
 function setupAutocomplete(inputId, dropdownId, isFrom) {
     const input = document.getElementById(inputId);
-    
+
     input.addEventListener('input', async (e) => {
         const query = e.target.value;
         if (query.length < 2) {
@@ -40,7 +68,7 @@ function setupAutocomplete(inputId, dropdownId, isFrom) {
         const airports = await searchAirports(query);
         showDropdown(dropdownId, airports, inputId, isFrom);
     });
-    
+
     input.addEventListener('focus', async () => {
         const query = input.value;
         if (query.length >= 2) {
@@ -48,7 +76,7 @@ function setupAutocomplete(inputId, dropdownId, isFrom) {
             showDropdown(dropdownId, airports, inputId, isFrom);
         }
     });
-    
+
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.field-group')) {
             hideDropdown(dropdownId);
@@ -68,7 +96,7 @@ async function searchAirports(query) {
 
 function showDropdown(dropdownId, airports, inputId, isFrom) {
     const dropdown = document.getElementById(dropdownId);
-    
+
     if (airports.length === 0) {
         dropdown.innerHTML = '<div class="dropdown-item">Keine Flughäfen gefunden</div>';
     } else {
@@ -133,7 +161,7 @@ async function searchFlights() {
         const data = await response.json();
 
         document.getElementById('loading').style.display = 'none';
-        
+
         if (data.success && data.flights && data.flights.length > 0) {
             document.getElementById('filters').style.display = 'flex';
             displayFlights(data.flights);
@@ -155,7 +183,7 @@ function extractCode(value) {
 
 function displayFlights(flights) {
     const container = document.getElementById('results');
-    
+
     container.innerHTML = flights.map(flight => {
         const segment = flight.itineraries?.[0]?.segments?.[0];
         const price = flight.price?.total || '---';
@@ -168,7 +196,7 @@ function displayFlights(flights) {
         const flightNum = segment?.number || '000';
         const duration = flight.itineraries?.[0]?.duration?.replace('PT', '').toLowerCase() || 'N/A';
         const stops = (flight.itineraries?.[0]?.segments?.length || 1) - 1;
-        
+
         return `
             <div class="flight-card">
                 <div class="flight-info">
@@ -214,27 +242,55 @@ function displayError(message) {
     `;
 }
 
-// ==================== SMART CHATBOT ====================
+// ==================== SMART CHATBOT MIT MEMORY ====================
 async function sendChat() {
     const input = document.getElementById('chat-input');
     const msg = input.value.trim();
     if (!msg) return;
-    
+
+    // Rate Limiter Check
+    if (!rateLimiter.canSend()) {
+        const waitTime = rateLimiter.getWaitTime();
+        appendChatMessage(`Bitte warte ${waitTime} Sekunden bevor du weitere Nachrichten sendest.`, 'ai');
+        return;
+    }
+
+    // User-Nachricht anzeigen
     appendChatMessage(msg, 'user');
     input.value = '';
-    
+
+    // Rate Limiter: Nachricht zählen
+    rateLimiter.recordMessage();
+
+    // Loading anzeigen
     const loadingId = appendChatMessage('Denke nach...', 'ai');
-    
+
     try {
-        const res = await fetch(`${API_URL}/smart_ask?question=${encodeURIComponent(msg)}`);
+        // POST Request mit Chat-History
+        const res = await fetch(`${API_URL}/chat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: window.chatHistory,
+                question: msg
+            })
+        });
+
         const data = await res.json();
-        
+
         removeChatMessage(loadingId);
-        
+
         if (data.type === 'flight_search') {
-            // KI hat Flugsuche erkannt → Felder ausfüllen
+            // KI hat Flugsuche erkannt
             appendChatMessage(data.message, 'ai');
-            
+
+            // History updaten
+            window.chatHistory.push({ role: 'user', content: msg });
+            window.chatHistory.push({ role: 'assistant', content: data.message });
+
+            // Felder ausfüllen
             if (data.from) {
                 document.getElementById('from').value = data.from;
                 selectedFrom = data.from;
@@ -246,17 +302,27 @@ async function sendChat() {
             if (data.date) {
                 document.getElementById('departure').value = data.date;
             }
-            
+
             // Automatisch suchen
             setTimeout(() => searchFlights(), 500);
-            
+
         } else {
             // Normale Chat-Antwort
             appendChatMessage(data.answer, 'ai');
+
+            // History updaten
+            window.chatHistory.push({ role: 'user', content: msg });
+            window.chatHistory.push({ role: 'assistant', content: data.answer });
         }
+
+        // History auf max 20 Nachrichten begrenzen (10 Paare)
+        if (window.chatHistory.length > 20) {
+            window.chatHistory = window.chatHistory.slice(-20);
+        }
+
     } catch (e) {
         removeChatMessage(loadingId);
-        appendChatMessage('Fehler beim Abrufen der Antwort.', 'ai');
+        appendChatMessage('Fehler beim Abrufen der Antwort. Bitte versuche es erneut.', 'ai');
     }
 }
 
@@ -279,4 +345,10 @@ function removeChatMessage(id) {
 
 function handleChatEnter(event) {
     if (event.key === 'Enter') sendChat();
+}
+
+// Chat-History löschen (optional - Button kann hinzugefügt werden)
+function clearChatHistory() {
+    window.chatHistory = [];
+    document.getElementById('chat-messages').innerHTML = '';
 }

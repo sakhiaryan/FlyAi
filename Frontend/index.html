@@ -5,116 +5,241 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlyAI - KI-gestützte Flugsuche</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="bg-decoration">
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+        <div class="bg-circle bg-circle-3"></div>
+    </div>
+
     <!-- Header -->
     <header class="header">
-        <div class="logo">
-            <span class="logo-icon">✈️</span>
-            <span class="logo-text">FlyAI</span>
-        </div>
-        <nav class="nav">
-            <a href="#" class="nav-link active">Flüge</a>
-            <a href="#" class="nav-link">Hotels</a>
-            <a href="#" class="nav-link">Mietwagen</a>
-        </nav>
-        <div class="header-actions">
-            <button class="btn-lang">DE 🇩🇪</button>
-            <button class="btn-login">Login</button>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-plane"></i>
+                </div>
+                <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-link active">
+                    <i class="fa-solid fa-plane-departure"></i>
+                    <span>Flüge</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-hotel"></i>
+                    <span>Hotels</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fa-solid fa-car"></i>
+                    <span>Mietwagen</span>
+                </a>
+            </nav>
+            <div class="header-actions">
+                <button class="btn-lang">
+                    <span class="flag">🇩🇪</span>
+                    <span>DE</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <button class="btn-login">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Anmelden</span>
+                </button>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
-        <h1>Finde die besten Flugdeals</h1>
-        <p class="hero-sub">KI-gestützte Suche • Preisvergleich • Gepäck & Visa Info</p>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>KI-gestützte Suche</span>
+            </div>
+            <h1>Entdecke die <span class="gradient-text">besten Flugdeals</span></h1>
+            <p class="hero-sub">Vergleiche tausende Flüge in Sekunden. Spare Zeit und Geld mit unserer intelligenten Suchmaschine.</p>
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Blitzschnell</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Sicher buchen</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fa-solid fa-piggy-bank"></i>
+                    <span>Bestpreisgarantie</span>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <!-- Main Content: Suche + Chat Sidebar -->
+    <!-- Main Content -->
     <main class="main-container">
-        
-        <!-- Linke Seite: Flugsuche -->
+
+        <!-- Left: Flight Search -->
         <div class="search-section">
             <div class="search-box">
+                <div class="search-box-header">
+                    <h2><i class="fa-solid fa-magnifying-glass"></i> Flugsuche</h2>
+                </div>
+
                 <div class="trip-toggle">
-                    <button class="trip-option active">Hin & Rückflug</button>
-                    <button class="trip-option">Nur Hinflug</button>
-                    <button class="trip-option">Multi-City</button>
+                    <button class="trip-option active">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <span>Hin & Rückflug</span>
+                    </button>
+                    <button class="trip-option">
+                        <i class="fa-solid fa-arrow-right"></i>
+                        <span>Nur Hinflug</span>
+                    </button>
+                    <button class="trip-option">
+                        <i class="fa-solid fa-route"></i>
+                        <span>Multi-City</span>
+                    </button>
                 </div>
 
                 <div class="search-fields">
-                    <div class="field-group">
-                        <label>Von</label>
-                        <input type="text" id="from" placeholder="Abflughafen" autocomplete="off">
-                        <div id="from-dropdown" class="airport-dropdown"></div>
+                    <div class="field-row">
+                        <div class="field-group field-from">
+                            <label>
+                                <i class="fa-solid fa-plane-departure"></i>
+                                Von
+                            </label>
+                            <input type="text" id="from" placeholder="Stadt oder Flughafen" autocomplete="off">
+                            <div id="from-dropdown" class="airport-dropdown"></div>
+                        </div>
+
+                        <button class="swap-btn" onclick="swapAirports()" title="Flughäfen tauschen">
+                            <i class="fa-solid fa-right-left"></i>
+                        </button>
+
+                        <div class="field-group field-to">
+                            <label>
+                                <i class="fa-solid fa-plane-arrival"></i>
+                                Nach
+                            </label>
+                            <input type="text" id="to" placeholder="Stadt oder Flughafen" autocomplete="off">
+                            <div id="to-dropdown" class="airport-dropdown"></div>
+                        </div>
                     </div>
 
-                    <button class="swap-btn" onclick="swapAirports()">⇄</button>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label>
+                                <i class="fa-regular fa-calendar"></i>
+                                Hinflug
+                            </label>
+                            <input type="date" id="departure">
+                        </div>
 
-                    <div class="field-group">
-                        <label>Nach</label>
-                        <input type="text" id="to" placeholder="Zielflughafen" autocomplete="off">
-                        <div id="to-dropdown" class="airport-dropdown"></div>
-                    </div>
+                        <div class="field-group">
+                            <label>
+                                <i class="fa-regular fa-calendar-check"></i>
+                                Rückflug
+                            </label>
+                            <input type="date" id="return">
+                        </div>
 
-                    <div class="field-group">
-                        <label>Hinflug</label>
-                        <input type="date" id="departure">
-                    </div>
-
-                    <div class="field-group">
-                        <label>Rückflug</label>
-                        <input type="date" id="return">
-                    </div>
-
-                    <div class="field-group">
-                        <label>Reisende</label>
-                        <select id="passengers">
-                            <option value="1">1 👤</option>
-                            <option value="2">2 👥</option>
-                            <option value="3">3 👥</option>
-                            <option value="4">4 👥</option>
-                        </select>
+                        <div class="field-group field-passengers">
+                            <label>
+                                <i class="fa-solid fa-users"></i>
+                                Reisende
+                            </label>
+                            <select id="passengers">
+                                <option value="1">1 Erwachsener</option>
+                                <option value="2">2 Erwachsene</option>
+                                <option value="3">3 Erwachsene</option>
+                                <option value="4">4 Erwachsene</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
                 <button class="search-btn" onclick="searchFlights()">
-                    <span>🔍</span> Flüge suchen
+                    <i class="fa-solid fa-search"></i>
+                    <span>Flüge suchen</span>
+                    <div class="btn-shine"></div>
                 </button>
             </div>
 
             <!-- Loading -->
             <div id="loading" class="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Suche läuft...</p>
+                <div class="loading-content">
+                    <div class="plane-animation">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+                    <p>Suche die besten Flüge für dich...</p>
+                    <div class="loading-bar">
+                        <div class="loading-progress"></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Filter -->
+            <!-- Filters -->
             <div id="filters" class="filters" style="display: none;">
-                <span class="filter-label">Sortieren:</span>
-                <button class="filter-btn active">Beste</button>
-                <button class="filter-btn">Günstigste</button>
-                <button class="filter-btn">Schnellste</button>
+                <span class="filter-label">
+                    <i class="fa-solid fa-sliders"></i>
+                    Sortieren:
+                </span>
+                <div class="filter-buttons">
+                    <button class="filter-btn active">
+                        <i class="fa-solid fa-star"></i>
+                        Beste
+                    </button>
+                    <button class="filter-btn">
+                        <i class="fa-solid fa-tag"></i>
+                        Günstigste
+                    </button>
+                    <button class="filter-btn">
+                        <i class="fa-solid fa-clock"></i>
+                        Schnellste
+                    </button>
+                </div>
             </div>
 
-            <!-- Ergebnisse -->
+            <!-- Results -->
             <div id="results" class="results"></div>
         </div>
 
-        <!-- Rechte Seite: KI-Chat Sidebar -->
+        <!-- Right: AI Chat Sidebar -->
         <aside class="chat-sidebar">
             <div class="chat-header">
-                <span class="chat-icon">🤖</span>
-                <h3>KI-Reiseberater</h3>
+                <div class="chat-header-icon">
+                    <i class="fa-solid fa-robot"></i>
+                    <span class="online-dot"></span>
+                </div>
+                <div class="chat-header-info">
+                    <h3>KI-Reiseberater</h3>
+                    <span class="chat-status">Online & bereit zu helfen</span>
+                </div>
             </div>
             <div class="chat-intro">
-                Frag mich alles über Reisen, Visa, Gepäck oder Flugempfehlungen!
+                <div class="intro-icon">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <p>Hallo! Ich bin dein persönlicher Reiseberater. Frag mich alles über:</p>
+                <div class="intro-tags">
+                    <span class="intro-tag"><i class="fa-solid fa-plane"></i> Flüge</span>
+                    <span class="intro-tag"><i class="fa-solid fa-passport"></i> Visa</span>
+                    <span class="intro-tag"><i class="fa-solid fa-suitcase"></i> Gepäck</span>
+                    <span class="intro-tag"><i class="fa-solid fa-lightbulb"></i> Tipps</span>
+                </div>
             </div>
             <div id="chat-messages" class="chat-messages"></div>
             <div class="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Deine Frage..." onkeypress="handleChatEnter(event)">
-                <button onclick="sendChat()" class="chat-send-btn">➤</button>
+                <input type="text" id="chat-input" placeholder="Schreibe eine Nachricht..." onkeypress="handleChatEnter(event)">
+                <button onclick="sendChat()" class="chat-send-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
             </div>
         </aside>
 
@@ -122,9 +247,33 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>© 2025 FlyAI – Deine KI-gestützte Flugsuche</p>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+                    <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
+                </div>
+                <p>Deine intelligente Flugsuche</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">Über uns</a>
+                <a href="#">Datenschutz</a>
+                <a href="#">Impressum</a>
+                <a href="#">Kontakt</a>
+            </div>
+            <div class="footer-social">
+                <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 FlyAI – Mit <i class="fa-solid fa-heart"></i> entwickelt</p>
+        </div>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=5"></script>
 </body>
 </html>

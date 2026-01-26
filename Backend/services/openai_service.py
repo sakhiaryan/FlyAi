@@ -1,53 +1,51 @@
 import openai
 import os
 from dotenv import load_dotenv
-from sqlmodel import Session, select, create_engine
-from models.chat_cache import ChatCache
 
 load_dotenv()
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-sqlite_url = "sqlite:///database.db"
-engine = create_engine(sqlite_url)
+SYSTEM_PROMPT = """Du bist ein freundlicher Reise-Buddy - locker, hilfsbereit und auf den Punkt.
 
-SYSTEM_PROMPT = """Du bist ein KI-Reiseberater für FlyAI.
-Du hilfst NUR bei folgenden Themen:
-- Flugsuche und Flugbuchungen
-- Reiseziele und Empfehlungen
-- Visa und Einreisebestimmungen
-- Gepäckregeln und Airline-Infos
-- Reiseplanung und Tipps
+DEIN STIL:
+- Antworte kurz und natürlich, wie ein Freund der sich auskennt
+- Max 2-3 Sätze pro Antwort, außer der User fragt explizit nach Details
+- Keine langen Listen ungefragt - frag erst ob der User das will
+- Nutze ab und zu ein Emoji, aber übertreib nicht
+- Antworte auf Deutsch
 
-Wenn jemand nach anderen Themen fragt (z.B. Kochen, Programmieren, Politik), 
-antworte freundlich: "Ich bin dein Reiseberater und kann dir nur bei Reisethemen helfen. 
-Frag mich gerne nach Flügen, Reisezielen, Visa oder Gepäck!"
+WICHTIG:
+- Merke dir den Namen des Users
+- Bevor du viele Tipps gibst, frag kurz: "Willst du ein paar Tipps dazu?"
+- Gib nur das Nötigste - kein Info-Overload
+- Sei wie ein Kumpel der schon dort war, nicht wie ein Reiseführer
 
-Antworte immer auf Deutsch, kurz und hilfreich."""
+BEISPIELE für gute Antworten:
+❌ Schlecht: "Paris hat viele tolle Restaurants! Hier sind 10 Empfehlungen mit Adressen, Öffnungszeiten und Preisen..."
+✅ Gut: "Paris hat mega gutes Essen! Suchst du was Bestimmtes - fancy, casual oder Street Food?"
 
-def ask_chatgpt(prompt: str):
-    normalized_question = prompt.strip().lower()
-    
-    with Session(engine) as session:
-        statement = select(ChatCache).where(ChatCache.question == normalized_question)
-        cached = session.exec(statement).first()
-        
-        if cached:
-            return cached.answer
-    
+❌ Schlecht: "Für Japan brauchst du als deutscher Staatsbürger kein Visum für Aufenthalte bis 90 Tage. Du benötigst einen gültigen Reisepass..."
+✅ Gut: "Als Deutscher brauchst du für Japan kein Visum - bis 90 Tage easy mit Reisepass! ✈️"
+
+Bleib locker und hilf dem User bei allem rund ums Reisen - Flüge, Visa, Tipps, Essen, was auch immer.
+"""
+
+def ask_chatgpt_with_history(messages: list):
+    """Chat mit Konversations-History"""
+
+    # System-Prompt am Anfang hinzufügen
+    full_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    full_messages.extend(messages)
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=500,
+        messages=full_messages,
+        max_tokens=300,
         temperature=0.7,
     )
-    answer = response.choices[0].message.content
-    
-    with Session(engine) as session:
-        cache_entry = ChatCache(question=normalized_question, answer=answer)
-        session.add(cache_entry)
-        session.commit()
-    
-    return answer
+
+    return response.choices[0].message.content
+
+def ask_chatgpt(prompt: str):
+    """Einfache Frage ohne History (für Kompatibilität)"""
+    return ask_chatgpt_with_history([{"role": "user", "content": prompt}])
