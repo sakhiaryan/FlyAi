@@ -1339,3 +1339,284 @@ body {
     background: var(--primary);
     color: white;
 }
+
+/* ========== TOAST NOTIFICATIONS ========== */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--bg-card);
+    padding: 16px 24px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast i {
+    font-size: 1.2rem;
+}
+
+.toast-info i { color: var(--primary); }
+.toast-success i { color: #10b981; }
+.toast-error i { color: #ef4444; }
+
+/* ========== BOOKING MODAL ========== */
+.booking-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.booking-modal.show {
+    opacity: 1;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    max-width: 450px;
+    width: 90%;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.booking-modal.show .modal-content {
+    transform: scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.modal-header i {
+    font-size: 3rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.modal-body {
+    margin-bottom: 24px;
+}
+
+.modal-flight-info {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.modal-route {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.modal-airport {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.modal-route i {
+    color: var(--primary);
+}
+
+.modal-details {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.modal-details span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.modal-price {
+    text-align: center;
+    padding: 16px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-md);
+    color: white;
+}
+
+.price-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.price-value {
+    font-size: 2rem;
+    font-weight: 700;
+    display: block;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+}
+
+.modal-btn.secondary {
+    background: #f1f5f9;
+    color: var(--text-secondary);
+}
+
+.modal-btn.secondary:hover {
+    background: #e2e8f0;
+}
+
+.modal-btn.primary {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.modal-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ========== ERROR CARD ========== */
+.error-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: 60px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+.error-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+}
+
+.error-icon i {
+    font-size: 2rem;
+    color: #ef4444;
+}
+
+.error-card h3 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.error-card p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.retry-btn {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.retry-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ========== IMPROVED FLIGHT CARD ========== */
+.flight-card .airline-logo {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.flight-card .select-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.flight-card .select-btn i {
+    font-size: 0.8rem;
+}

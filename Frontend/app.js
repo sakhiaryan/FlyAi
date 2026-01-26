@@ -2,6 +2,8 @@ const API_URL = 'http://127.0.0.1:8000';
 
 let selectedFrom = '';
 let selectedTo = '';
+let tripType = 'roundtrip'; // 'roundtrip', 'oneway', 'multicity'
+let currentFlights = []; // Speichert aktuelle Suchergebnisse
 
 // Chat-History speichern (global für Debugging)
 window.chatHistory = [];
@@ -43,10 +45,33 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAutocomplete('from', 'from-dropdown', true);
     setupAutocomplete('to', 'to-dropdown', false);
 
-    document.querySelectorAll('.trip-option').forEach(option => {
+    // Trip-Toggle Setup
+    document.querySelectorAll('.trip-option').forEach((option, index) => {
         option.addEventListener('click', () => {
             document.querySelectorAll('.trip-option').forEach(o => o.classList.remove('active'));
             option.classList.add('active');
+
+            const returnField = document.getElementById('return').closest('.field-group');
+            if (index === 0) {
+                tripType = 'roundtrip';
+                returnField.style.display = 'block';
+            } else if (index === 1) {
+                tripType = 'oneway';
+                returnField.style.display = 'none';
+            } else {
+                tripType = 'multicity';
+                returnField.style.display = 'none';
+                showToast('Multi-City wird bald verfügbar!', 'info');
+            }
+        });
+    });
+
+    // Filter-Buttons Setup
+    document.querySelectorAll('.filter-btn').forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            sortFlights(index);
         });
     });
 });
@@ -181,28 +206,33 @@ function extractCode(value) {
     return '';
 }
 
-function displayFlights(flights) {
+function displayFlights(flights, saveToState = true) {
+    if (saveToState) {
+        currentFlights = flights;
+    }
+
     const container = document.getElementById('results');
 
-    container.innerHTML = flights.map(flight => {
+    container.innerHTML = flights.map((flight, index) => {
         const segment = flight.itineraries?.[0]?.segments?.[0];
+        const lastSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
         const price = flight.price?.total || '---';
         const currency = flight.price?.currency || 'EUR';
         const departure = segment?.departure?.iataCode || 'N/A';
-        const arrival = segment?.arrival?.iataCode || 'N/A';
+        const arrival = lastSegment?.arrival?.iataCode || 'N/A';
         const depTime = segment?.departure?.at?.slice(11, 16) || '--:--';
-        const arrTime = segment?.arrival?.at?.slice(11, 16) || '--:--';
+        const arrTime = lastSegment?.arrival?.at?.slice(11, 16) || '--:--';
         const carrier = segment?.carrierCode || 'XX';
         const flightNum = segment?.number || '000';
-        const duration = flight.itineraries?.[0]?.duration?.replace('PT', '').toLowerCase() || 'N/A';
+        const duration = formatDuration(flight.itineraries?.[0]?.duration);
         const stops = (flight.itineraries?.[0]?.segments?.length || 1) - 1;
 
         return `
-            <div class="flight-card">
+            <div class="flight-card" data-index="${index}">
                 <div class="flight-info">
                     <div class="flight-airline">
-                        <div class="airline-logo">✈️</div>
-                        <span>${carrier}${flightNum}</span>
+                        <div class="airline-logo"><i class="fa-solid fa-plane"></i></div>
+                        <span>${carrier} ${flightNum}</span>
                     </div>
                     <div class="flight-times">
                         <div class="departure">
@@ -223,23 +253,160 @@ function displayFlights(flights) {
                 <div class="flight-price">
                     <div class="price">${price} ${currency}</div>
                     <div class="price-note">pro Person</div>
-                    <button class="select-btn">Auswählen</button>
+                    <button class="select-btn" onclick="selectFlight(${index})">
+                        <i class="fa-solid fa-check"></i> Auswählen
+                    </button>
                 </div>
             </div>
         `;
     }).join('');
 }
 
+function formatDuration(duration) {
+    if (!duration) return 'N/A';
+    const match = duration.match(/PT(\d+)H?(\d+)?M?/);
+    if (!match) return duration.replace('PT', '').toLowerCase();
+    const hours = match[1] || '0';
+    const minutes = match[2] || '0';
+    return `${hours}h ${minutes}m`;
+}
+
 function displayError(message) {
     document.getElementById('results').innerHTML = `
-        <div class="flight-card" style="justify-content: center; text-align: center;">
-            <div>
-                <div style="font-size: 3rem; margin-bottom: 1rem;">😕</div>
-                <h3>Keine Flüge gefunden</h3>
-                <p style="color: #888;">${message}</p>
+        <div class="error-card">
+            <div class="error-icon"><i class="fa-solid fa-plane-slash"></i></div>
+            <h3>Keine Flüge gefunden</h3>
+            <p>${message}</p>
+            <button class="retry-btn" onclick="searchFlights()">
+                <i class="fa-solid fa-rotate"></i> Erneut suchen
+            </button>
+        </div>
+    `;
+}
+
+// ==================== SORTIERUNG ====================
+function sortFlights(sortIndex) {
+    if (!currentFlights || currentFlights.length === 0) return;
+
+    let sorted = [...currentFlights];
+
+    if (sortIndex === 1) {
+        // Günstigste
+        sorted.sort((a, b) => parseFloat(a.price?.total || 0) - parseFloat(b.price?.total || 0));
+    } else if (sortIndex === 2) {
+        // Schnellste
+        sorted.sort((a, b) => {
+            const durationA = parseDuration(a.itineraries?.[0]?.duration);
+            const durationB = parseDuration(b.itineraries?.[0]?.duration);
+            return durationA - durationB;
+        });
+    }
+    // index 0 = "Beste" bleibt original
+
+    displayFlights(sorted);
+}
+
+function parseDuration(duration) {
+    if (!duration) return Infinity;
+    const match = duration.match(/PT(\d+)H?(\d+)?M?/);
+    if (!match) return Infinity;
+    const hours = parseInt(match[1] || 0);
+    const minutes = parseInt(match[2] || 0);
+    return hours * 60 + minutes;
+}
+
+// ==================== TOAST NOTIFICATIONS ====================
+function showToast(message, type = 'info') {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <i class="fa-solid fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ==================== FLUG AUSWÄHLEN ====================
+function selectFlight(flightIndex) {
+    const flight = currentFlights[flightIndex];
+    if (!flight) return;
+
+    const segment = flight.itineraries?.[0]?.segments?.[0];
+    const price = flight.price?.total || '---';
+    const currency = flight.price?.currency || 'EUR';
+    const departure = segment?.departure?.iataCode || 'N/A';
+    const arrival = segment?.arrival?.iataCode || 'N/A';
+    const depTime = segment?.departure?.at?.slice(11, 16) || '--:--';
+    const carrier = segment?.carrierCode || 'XX';
+    const flightNum = segment?.number || '000';
+
+    // Modal anzeigen
+    showBookingModal(flight, {
+        price, currency, departure, arrival, depTime, carrier, flightNum
+    });
+}
+
+function showBookingModal(flight, details) {
+    const modal = document.createElement('div');
+    modal.className = 'booking-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">
+                <i class="fa-solid fa-times"></i>
+            </button>
+            <div class="modal-header">
+                <i class="fa-solid fa-plane-departure"></i>
+                <h2>Flug ausgewählt</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-flight-info">
+                    <div class="modal-route">
+                        <span class="modal-airport">${details.departure}</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                        <span class="modal-airport">${details.arrival}</span>
+                    </div>
+                    <div class="modal-details">
+                        <span><i class="fa-solid fa-plane"></i> ${details.carrier}${details.flightNum}</span>
+                        <span><i class="fa-solid fa-clock"></i> ${details.depTime}</span>
+                    </div>
+                </div>
+                <div class="modal-price">
+                    <span class="price-label">Gesamtpreis</span>
+                    <span class="price-value">${details.price} ${details.currency}</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" onclick="closeModal()">Abbrechen</button>
+                <button class="modal-btn primary" onclick="proceedBooking()">
+                    <i class="fa-solid fa-credit-card"></i> Zur Buchung
+                </button>
             </div>
         </div>
     `;
+    document.body.appendChild(modal);
+    setTimeout(() => modal.classList.add('show'), 10);
+}
+
+function closeModal() {
+    const modal = document.querySelector('.booking-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+function proceedBooking() {
+    closeModal();
+    showToast('Buchungsfunktion kommt bald!', 'info');
 }
 
 // ==================== SMART CHATBOT MIT MEMORY ====================
