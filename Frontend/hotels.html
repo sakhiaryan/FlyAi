@@ -4,199 +4,310 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlyAI - Hotels finden</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=6">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .hotel-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .hotel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        .hotel-image {
+            width: 220px;
+            height: 180px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .hotel-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .hotel-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: #10b981;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .hotel-info {
+            flex: 1;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .hotel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .hotel-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 0;
+        }
+        .hotel-stars {
+            color: #f59e0b;
+            font-size: 0.9rem;
+        }
+        .hotel-location {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+        .hotel-location i {
+            color: var(--primary);
+        }
+        .hotel-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .rating-score {
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .rating-text {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .rating-count {
+            color: #9ca3af;
+            font-size: 0.85rem;
+        }
+        .hotel-amenities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .amenity {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .amenity i {
+            color: #10b981;
+            font-size: 0.7rem;
+        }
+        .hotel-price {
+            width: 180px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 8px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 1px solid #e5e7eb;
+        }
+        .price-info {
+            text-align: right;
+        }
+        .price-per-night {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .price-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        .price-total {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        .nights-info {
+            display: block;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        .modal-hotel-info h3 {
+            margin: 0 0 8px 0;
+            color: #1a1a2e;
+        }
+        .modal-hotel-info p {
+            margin: 0 0 12px 0;
+            color: #6b7280;
+        }
+        .modal-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-rating .rating-score {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+        @media (max-width: 768px) {
+            .hotel-card {
+                flex-direction: column;
+            }
+            .hotel-image {
+                width: 100%;
+                height: 200px;
+            }
+            .hotel-price {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                border-left: none;
+                border-top: 1px solid #e5e7eb;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Animated Background -->
     <div class="bg-decoration">
         <div class="bg-circle bg-circle-1"></div>
         <div class="bg-circle bg-circle-2"></div>
         <div class="bg-circle bg-circle-3"></div>
     </div>
 
-    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <div class="logo">
-                <div class="logo-icon">
-                    <i class="fa-solid fa-plane"></i>
-                </div>
+                <div class="logo-icon"><i class="fa-solid fa-plane"></i></div>
                 <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
             </div>
             <nav class="nav">
-                <a href="index.html" class="nav-link">
-                    <i class="fa-solid fa-plane-departure"></i>
-                    <span>Flüge</span>
-                </a>
-                <a href="hotels.html" class="nav-link active">
-                    <i class="fa-solid fa-hotel"></i>
-                    <span>Hotels</span>
-                </a>
-                <a href="mietwagen.html" class="nav-link">
-                    <i class="fa-solid fa-car"></i>
-                    <span>Mietwagen</span>
-                </a>
-                <a href="aktivitaeten.html" class="nav-link">
-                    <i class="fa-solid fa-ticket"></i>
-                    <span>Aktivitäten</span>
-                </a>
+                <a href="index.html" class="nav-link"><i class="fa-solid fa-plane-departure"></i><span>Flüge</span></a>
+                <a href="hotels.html" class="nav-link active"><i class="fa-solid fa-hotel"></i><span>Hotels</span></a>
+                <a href="mietwagen.html" class="nav-link"><i class="fa-solid fa-car"></i><span>Mietwagen</span></a>
+                <a href="aktivitaeten.html" class="nav-link"><i class="fa-solid fa-ticket"></i><span>Aktivitäten</span></a>
             </nav>
             <div class="header-actions">
-                <button class="btn-lang">
-                    <span class="flag">🇩🇪</span>
-                    <span>DE</span>
-                    <i class="fa-solid fa-chevron-down"></i>
+                <button class="btn-cart" onclick="window.location.href='index.html'">
+                    <i class="fa-solid fa-shopping-cart"></i>
+                    <span class="cart-badge" id="cart-badge" style="display:none">0</span>
                 </button>
-                <button class="btn-login">
-                    <i class="fa-solid fa-user"></i>
-                    <span>Anmelden</span>
-                </button>
+                <button class="btn-lang"><span class="flag">🇩🇪</span><span>DE</span><i class="fa-solid fa-chevron-down"></i></button>
+                <button class="btn-login"><i class="fa-solid fa-user"></i><span>Anmelden</span></button>
             </div>
-            <button class="mobile-menu-btn">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-badge">
-                <i class="fa-solid fa-sparkles"></i>
-                <span>Beste Hotelpreise</span>
-            </div>
+            <div class="hero-badge"><i class="fa-solid fa-sparkles"></i><span>Beste Hotelpreise</span></div>
             <h1>Finde dein <span class="gradient-text">Traumhotel</span></h1>
             <p class="hero-sub">Vergleiche tausende Hotels weltweit. Von Budget bis Luxus - wir finden das perfekte Hotel für dich.</p>
             <div class="hero-features">
-                <div class="hero-feature">
-                    <i class="fa-solid fa-percent"></i>
-                    <span>Exklusive Rabatte</span>
-                </div>
-                <div class="hero-feature">
-                    <i class="fa-solid fa-star"></i>
-                    <span>Verifizierte Bewertungen</span>
-                </div>
-                <div class="hero-feature">
-                    <i class="fa-solid fa-ban"></i>
-                    <span>Kostenlose Stornierung</span>
-                </div>
+                <div class="hero-feature"><i class="fa-solid fa-percent"></i><span>Exklusive Rabatte</span></div>
+                <div class="hero-feature"><i class="fa-solid fa-star"></i><span>Verifizierte Bewertungen</span></div>
+                <div class="hero-feature"><i class="fa-solid fa-ban"></i><span>Kostenlose Stornierung</span></div>
             </div>
         </div>
     </section>
 
-    <!-- Main Content -->
     <main class="main-container">
         <div class="search-section">
             <div class="search-box">
-                <div class="search-box-header">
-                    <h2><i class="fa-solid fa-hotel"></i> Hotelsuche</h2>
-                </div>
-
+                <div class="search-box-header"><h2><i class="fa-solid fa-hotel"></i> Hotelsuche</h2></div>
                 <div class="search-fields">
                     <div class="field-row">
-                        <div class="field-group" style="flex: 2;">
-                            <label>
-                                <i class="fa-solid fa-location-dot"></i>
-                                Reiseziel
-                            </label>
+                        <div class="field-group" style="flex: 2; position: relative;">
+                            <label><i class="fa-solid fa-location-dot"></i> Reiseziel</label>
                             <input type="text" id="destination" placeholder="Stadt, Region oder Hotel" autocomplete="off">
+                            <div id="destination-dropdown" class="dropdown"></div>
                         </div>
                     </div>
-
                     <div class="field-row">
                         <div class="field-group">
-                            <label>
-                                <i class="fa-regular fa-calendar"></i>
-                                Check-in
-                            </label>
+                            <label><i class="fa-regular fa-calendar"></i> Check-in</label>
                             <input type="date" id="checkin">
                         </div>
-
                         <div class="field-group">
-                            <label>
-                                <i class="fa-regular fa-calendar-check"></i>
-                                Check-out
-                            </label>
+                            <label><i class="fa-regular fa-calendar-check"></i> Check-out</label>
                             <input type="date" id="checkout">
                         </div>
-
                         <div class="field-group">
-                            <label>
-                                <i class="fa-solid fa-bed"></i>
-                                Zimmer
-                            </label>
+                            <label><i class="fa-solid fa-bed"></i> Zimmer</label>
                             <select id="rooms">
                                 <option value="1">1 Zimmer</option>
                                 <option value="2">2 Zimmer</option>
                                 <option value="3">3 Zimmer</option>
-                                <option value="4">4 Zimmer</option>
                             </select>
                         </div>
-
                         <div class="field-group">
-                            <label>
-                                <i class="fa-solid fa-users"></i>
-                                Gäste
-                            </label>
+                            <label><i class="fa-solid fa-users"></i> Gäste</label>
                             <select id="guests">
                                 <option value="1">1 Gast</option>
-                                <option value="2">2 Gäste</option>
+                                <option value="2" selected>2 Gäste</option>
                                 <option value="3">3 Gäste</option>
                                 <option value="4">4 Gäste</option>
                             </select>
                         </div>
                     </div>
                 </div>
-
                 <button class="search-btn" onclick="searchHotels()">
-                    <i class="fa-solid fa-search"></i>
-                    <span>Hotels suchen</span>
-                    <div class="btn-shine"></div>
+                    <i class="fa-solid fa-search"></i><span>Hotels suchen</span><div class="btn-shine"></div>
                 </button>
             </div>
 
-            <!-- Coming Soon -->
-            <div class="coming-soon-card">
-                <div class="coming-soon-icon">
-                    <i class="fa-solid fa-hotel"></i>
-                </div>
-                <h3>Hotelsuche kommt bald!</h3>
-                <p>Wir arbeiten daran, dir die besten Hotelangebote zu präsentieren. Bald kannst du hier Hotels suchen und buchen.</p>
+            <div id="filters" class="filter-buttons" style="display: none;">
+                <span class="filter-label"><i class="fa-solid fa-sliders"></i> Sortieren:</span>
+                <button class="filter-btn active" onclick="sortHotels(0); setActiveFilter(this)"><i class="fa-solid fa-star"></i> Empfohlen</button>
+                <button class="filter-btn" onclick="sortHotels(1); setActiveFilter(this)"><i class="fa-solid fa-tag"></i> Günstigste</button>
+                <button class="filter-btn" onclick="sortHotels(2); setActiveFilter(this)"><i class="fa-solid fa-trophy"></i> Beste Bewertung</button>
+            </div>
+
+            <div id="loading" class="loading-indicator" style="display: none;">
+                <div class="loading-content"><i class="fa-solid fa-hotel fa-bounce"></i><p>Suche Hotels...</p></div>
+            </div>
+
+            <div id="results" class="results-container"></div>
+
+            <div class="coming-soon-card" id="initial-card">
+                <div class="coming-soon-icon"><i class="fa-solid fa-hotel"></i></div>
+                <h3>Starte deine Hotelsuche!</h3>
+                <p>Gib ein Reiseziel ein und finde die besten Hotels zu günstigen Preisen.</p>
                 <div class="coming-soon-features">
-                    <div class="feature-item">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Über 1 Million Hotels</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Bestpreisgarantie</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Echte Gästebewertungen</span>
-                    </div>
+                    <div class="feature-item"><i class="fa-solid fa-check"></i><span>Über 1 Million Hotels</span></div>
+                    <div class="feature-item"><i class="fa-solid fa-check"></i><span>Bestpreisgarantie</span></div>
+                    <div class="feature-item"><i class="fa-solid fa-check"></i><span>Echte Gästebewertungen</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- Right: AI Chat Sidebar -->
         <aside class="chat-sidebar">
             <div class="chat-header">
-                <div class="chat-header-icon">
-                    <i class="fa-solid fa-robot"></i>
-                    <span class="online-dot"></span>
-                </div>
-                <div class="chat-header-info">
-                    <h3>KI-Reiseberater</h3>
-                    <span class="chat-status">Online & bereit zu helfen</span>
-                </div>
+                <div class="chat-header-icon"><i class="fa-solid fa-robot"></i><span class="online-dot"></span></div>
+                <div class="chat-header-info"><h3>KI-Reiseberater</h3><span class="chat-status">Online & bereit zu helfen</span></div>
             </div>
             <div class="chat-intro">
-                <div class="intro-icon">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                </div>
+                <div class="intro-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
                 <p>Ich helfe dir bei der Hotelsuche! Frag mich nach:</p>
                 <div class="intro-tags">
                     <span class="intro-tag"><i class="fa-solid fa-hotel"></i> Hotels</span>
@@ -208,60 +319,32 @@
             <div id="chat-messages" class="chat-messages"></div>
             <div class="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Schreibe eine Nachricht..." onkeypress="handleChatEnter(event)">
-                <button onclick="sendChat()" class="chat-send-btn">
-                    <i class="fa-solid fa-paper-plane"></i>
-                </button>
+                <button onclick="sendChat()" class="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </aside>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fa-solid fa-plane"></i>
-                    </div>
-                    <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
-                </div>
+                <div class="logo"><div class="logo-icon"><i class="fa-solid fa-plane"></i></div><span class="logo-text">Fly<span class="logo-highlight">AI</span></span></div>
                 <p>Deine intelligente Reiseplattform</p>
             </div>
-            <div class="footer-links">
-                <a href="#">Über uns</a>
-                <a href="#">Datenschutz</a>
-                <a href="#">Impressum</a>
-                <a href="#">Kontakt</a>
-            </div>
+            <div class="footer-links"><a href="#">Über uns</a><a href="#">Datenschutz</a><a href="#">Impressum</a><a href="#">Kontakt</a></div>
             <div class="footer-social">
                 <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
                 <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
                 <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>© 2025 FlyAI – Mit <i class="fa-solid fa-heart"></i> entwickelt</p>
-        </div>
+        <div class="footer-bottom"><p>© 2026 FlyAI – Mit <i class="fa-solid fa-heart"></i> entwickelt</p></div>
     </footer>
 
-    <script src="app.js?v=7"></script>
+    <script src="hotel-app.js?v=2"></script>
     <script>
-        // Datum-Inputs auf heute + 7 Tage setzen
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date();
-            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-            const checkoutDate = new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000);
-
-            document.getElementById('checkin').value = formatDateLocal(nextWeek);
-            document.getElementById('checkout').value = formatDateLocal(checkoutDate);
-        });
-
-        function formatDateLocal(date) {
-            return date.toISOString().split('T')[0];
-        }
-
-        function searchHotels() {
-            showToast('Hotelsuche wird bald verfügbar sein!', 'info');
+        function setActiveFilter(btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
     </script>
 </body>

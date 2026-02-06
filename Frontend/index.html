@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlyAI - KI-gestützte Flugsuche</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=7">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -44,6 +44,10 @@
                 </a>
             </nav>
             <div class="header-actions">
+                <button class="btn-cart" onclick="toggleCart()">
+                    <i class="fa-solid fa-shopping-cart"></i>
+                    <span class="cart-badge" id="cart-badge">0</span>
+                </button>
                 <button class="btn-lang">
                     <span class="flag">🇩🇪</span>
                     <span>DE</span>
@@ -54,11 +58,55 @@
                     <span>Anmelden</span>
                 </button>
             </div>
-            <button class="mobile-menu-btn">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
     </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav-overlay" onclick="toggleMobileMenu()"></div>
+    <nav class="mobile-nav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-plane"></i>
+                </div>
+                <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
+            </div>
+            <button class="mobile-nav-close" onclick="toggleMobileMenu()">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="index.html" class="mobile-nav-link active">
+                <i class="fa-solid fa-plane-departure"></i>
+                <span>Flüge</span>
+            </a>
+            <a href="hotels.html" class="mobile-nav-link">
+                <i class="fa-solid fa-hotel"></i>
+                <span>Hotels</span>
+            </a>
+            <a href="mietwagen.html" class="mobile-nav-link">
+                <i class="fa-solid fa-car"></i>
+                <span>Mietwagen</span>
+            </a>
+            <a href="aktivitaeten.html" class="mobile-nav-link">
+                <i class="fa-solid fa-ticket"></i>
+                <span>Aktivitäten</span>
+            </a>
+        </div>
+        <div class="mobile-nav-footer">
+            <button class="btn-login" onclick="showLoginModal()">
+                <i class="fa-solid fa-user"></i>
+                <span>Anmelden</span>
+            </button>
+            <div class="mobile-lang-switch">
+                <button class="mobile-lang-btn active" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+                <button class="mobile-lang-btn" onclick="setLanguage('en')">🇬🇧 English</button>
+            </div>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -226,23 +274,102 @@
 
             <!-- Filters -->
             <div id="filters" class="filters" style="display: none;">
-                <span class="filter-label">
-                    <i class="fa-solid fa-sliders"></i>
-                    Sortieren:
-                </span>
-                <div class="filter-buttons">
-                    <button class="filter-btn active">
-                        <i class="fa-solid fa-star"></i>
-                        Beste
+                <div class="filters-row">
+                    <span class="filter-label">
+                        <i class="fa-solid fa-sliders"></i>
+                        Sortieren:
+                    </span>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active">
+                            <i class="fa-solid fa-star"></i>
+                            Beste
+                        </button>
+                        <button class="filter-btn">
+                            <i class="fa-solid fa-tag"></i>
+                            Günstigste
+                        </button>
+                        <button class="filter-btn">
+                            <i class="fa-solid fa-clock"></i>
+                            Schnellste
+                        </button>
+                    </div>
+                    <button class="filter-toggle-btn" onclick="toggleAdvancedFilters()">
+                        <i class="fa-solid fa-filter"></i>
+                        Filter
                     </button>
-                    <button class="filter-btn">
-                        <i class="fa-solid fa-tag"></i>
-                        Günstigste
-                    </button>
-                    <button class="filter-btn">
-                        <i class="fa-solid fa-clock"></i>
-                        Schnellste
-                    </button>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div id="advanced-filters" class="advanced-filters" style="display: none;">
+                    <div class="filter-group">
+                        <label><i class="fa-solid fa-plane-circle-check"></i> Stops</label>
+                        <div class="filter-options">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-direct" onchange="applyFilters()">
+                                <span>Nur Direktflüge</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-1stop" checked onchange="applyFilters()">
+                                <span>Max. 1 Stopp</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-2stops" checked onchange="applyFilters()">
+                                <span>2+ Stopps</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label><i class="fa-solid fa-sun"></i> Abflugzeit</label>
+                        <div class="filter-options">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-morning" checked onchange="applyFilters()">
+                                <span>Morgens (06-12)</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-afternoon" checked onchange="applyFilters()">
+                                <span>Nachmittag (12-18)</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-evening" checked onchange="applyFilters()">
+                                <span>Abends (18-24)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label><i class="fa-solid fa-suitcase-rolling"></i> Gepäck</label>
+                        <div class="filter-options">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" id="filter-luggage" onchange="applyFilters()">
+                                <span>Aufgabegepäck inkl.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label><i class="fa-solid fa-euro-sign"></i> Preisspanne</label>
+                        <div class="price-range-container">
+                            <input type="range" id="price-range" min="0" max="2000" value="2000" oninput="updatePriceRange()">
+                            <span id="price-range-value">Max: 2000€</span>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label><i class="fa-solid fa-building"></i> Airlines</label>
+                        <div class="filter-options airline-options" id="airline-filters">
+                            <!-- Dynamisch gefüllt -->
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="filter-reset-btn" onclick="resetFilters()">
+                            <i class="fa-solid fa-rotate-left"></i> Zurücksetzen
+                        </button>
+                        <button class="filter-apply-btn" onclick="applyFilters()">
+                            <i class="fa-solid fa-check"></i> Anwenden
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -310,10 +437,35 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2025 FlyAI – Mit <i class="fa-solid fa-heart"></i> entwickelt</p>
+            <p>© 2026 FlyAI – Mit <i class="fa-solid fa-heart"></i> entwickelt</p>
         </div>
     </footer>
 
-    <script src="app.js?v=12"></script>
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h3><i class="fa-solid fa-shopping-cart"></i> Dein Warenkorb</h3>
+            <button class="cart-close-btn" onclick="toggleCart()"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div id="cart-items" class="cart-items">
+            <div class="cart-empty">
+                <i class="fa-solid fa-shopping-cart"></i>
+                <p>Dein Warenkorb ist leer</p>
+                <span>Füge Flüge oder Hotels hinzu</span>
+            </div>
+        </div>
+        <div id="cart-footer" class="cart-footer" style="display: none;">
+            <div class="cart-total">
+                <span>Gesamt:</span>
+                <span id="cart-total-price">0 EUR</span>
+            </div>
+            <button class="cart-checkout-btn" onclick="checkout()">
+                <i class="fa-solid fa-credit-card"></i> Zur Buchung
+            </button>
+        </div>
+    </div>
+    <div id="cart-overlay" class="cart-overlay" onclick="toggleCart()"></div>
+
+    <script src="app.js?v=19"></script>
 </body>
 </html>

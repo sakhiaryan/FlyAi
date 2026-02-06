@@ -87,6 +87,21 @@ COUNTRY_SLUGS = {
     "australien": "australien",
     "neuseeland": "neuseeland",
     "fidschi": "fidschi",
+
+    # Kritische Länder
+    "syrien": "syrien",
+    "afghanistan": "afghanistan",
+    "irak": "irak",
+    "iran": "iran",
+    "jemen": "jemen",
+    "libyen": "libyen",
+    "russland": "russland",
+    "ukraine": "ukraine",
+    "nordkorea": "nordkorea",
+    "somalia": "somalia",
+    "sudan": "sudan",
+    "venezuela": "venezuela",
+    "myanmar": "myanmar",
 }
 
 
@@ -243,3 +258,76 @@ def format_aa_info_for_chat(info: Dict) -> str:
         return "\n\n".join(parts)
 
     return ""
+
+
+def get_aa_direct_link(country: str) -> Dict:
+    """
+    Gibt direkt den Link zum Auswärtigen Amt zurück - Token-sparend!
+
+    Returns:
+        Dict mit: success, country, url, short_info
+    """
+    slug = get_country_slug(country)
+
+    if not slug:
+        return {
+            "success": False,
+            "country": country,
+            "url": None,
+            "short_info": f"Land '{country}' nicht in der Datenbank gefunden."
+        }
+
+    # Haupt-URL für Reise- und Sicherheitshinweise
+    url = f"https://www.auswaertiges-amt.de/de/service/laender/{slug}-node/{slug}/reise-und-sicherheitshinweise"
+
+    return {
+        "success": True,
+        "country": country.title(),
+        "url": url,
+        "short_info": f"Offizielle Reisehinweise für {country.title()} vom Auswärtigen Amt"
+    }
+
+
+def format_aa_link_for_chat(country: str) -> str:
+    """
+    Formatiert einen kurzen Link-Hinweis für den Chat - spart Tokens!
+    """
+    result = get_aa_direct_link(country)
+
+    if not result["success"]:
+        return f"❓ Für {country} konnte kein Link gefunden werden."
+
+    return f"""🔗 **Auswärtiges Amt - {result['country']}**
+Aktuelle Reise- und Sicherheitshinweise:
+{result['url']}"""
+
+
+# Schnelle Lookup-Funktion für häufige Länder
+QUICK_AA_LINKS = {
+    "usa": "https://www.auswaertiges-amt.de/de/service/laender/usa-node/usa/reise-und-sicherheitshinweise",
+    "spanien": "https://www.auswaertiges-amt.de/de/service/laender/spanien-node/spanien/reise-und-sicherheitshinweise",
+    "italien": "https://www.auswaertiges-amt.de/de/service/laender/italien-node/italien/reise-und-sicherheitshinweise",
+    "frankreich": "https://www.auswaertiges-amt.de/de/service/laender/frankreich-node/frankreich/reise-und-sicherheitshinweise",
+    "griechenland": "https://www.auswaertiges-amt.de/de/service/laender/griechenland-node/griechenland/reise-und-sicherheitshinweise",
+    "türkei": "https://www.auswaertiges-amt.de/de/service/laender/tuerkei-node/tuerkei/reise-und-sicherheitshinweise",
+    "thailand": "https://www.auswaertiges-amt.de/de/service/laender/thailand-node/thailand/reise-und-sicherheitshinweise",
+    "ägypten": "https://www.auswaertiges-amt.de/de/service/laender/aegypten-node/aegypten/reise-und-sicherheitshinweise",
+    "marokko": "https://www.auswaertiges-amt.de/de/service/laender/marokko-node/marokko/reise-und-sicherheitshinweise",
+    "japan": "https://www.auswaertiges-amt.de/de/service/laender/japan-node/japan/reise-und-sicherheitshinweise",
+    "china": "https://www.auswaertiges-amt.de/de/service/laender/china-node/china/reise-und-sicherheitshinweise",
+    "indonesien": "https://www.auswaertiges-amt.de/de/service/laender/indonesien-node/indonesien/reise-und-sicherheitshinweise",
+    "mexiko": "https://www.auswaertiges-amt.de/de/service/laender/mexiko-node/mexiko/reise-und-sicherheitshinweise",
+    "brasilien": "https://www.auswaertiges-amt.de/de/service/laender/brasilien-node/brasilien/reise-und-sicherheitshinweise",
+    "australien": "https://www.auswaertiges-amt.de/de/service/laender/australien-node/australien/reise-und-sicherheitshinweise",
+    "portugal": "https://www.auswaertiges-amt.de/de/service/laender/portugal-node/portugal/reise-und-sicherheitshinweise",
+    "kroatien": "https://www.auswaertiges-amt.de/de/service/laender/kroatien-node/kroatien/reise-und-sicherheitshinweise",
+    "österreich": "https://www.auswaertiges-amt.de/de/service/laender/oesterreich-node/oesterreich/reise-und-sicherheitshinweise",
+    "niederlande": "https://www.auswaertiges-amt.de/de/service/laender/niederlande-node/niederlande/reise-und-sicherheitshinweise",
+    "polen": "https://www.auswaertiges-amt.de/de/service/laender/polen-node/polen/reise-und-sicherheitshinweise",
+    "dubai": "https://www.auswaertiges-amt.de/de/service/laender/vereinigtearabischeemirate-node/vereinigtearabischeemirate/reise-und-sicherheitshinweise",
+    "vae": "https://www.auswaertiges-amt.de/de/service/laender/vereinigtearabischeemirate-node/vereinigtearabischeemirate/reise-und-sicherheitshinweise",
+    "indien": "https://www.auswaertiges-amt.de/de/service/laender/indien-node/indien/reise-und-sicherheitshinweise",
+    "vietnam": "https://www.auswaertiges-amt.de/de/service/laender/vietnam-node/vietnam/reise-und-sicherheitshinweise",
+    "südafrika": "https://www.auswaertiges-amt.de/de/service/laender/suedafrika-node/suedafrika/reise-und-sicherheitshinweise",
+    "kenia": "https://www.auswaertiges-amt.de/de/service/laender/kenia-node/kenia/reise-und-sicherheitshinweise",
+}
