@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FlyAI - Finde und vergleiche tausende Hotels weltweit. Von Budget bis Luxus zum Bestpreis.">
+    <meta name="theme-color" content="#0a0a0f">
     <title>FlyAI - Hotels finden</title>
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
+    <link rel="stylesheet" href="style.css?v=10">
     <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -28,18 +31,41 @@
                 <a href="aktivitaeten.html" class="nav-link"><i class="fa-solid fa-ticket"></i><span>Aktivitäten</span></a>
             </nav>
             <div class="header-actions">
-                <button class="btn-cart" onclick="window.location.href='index.html'">
+                <button class="btn-cart" onclick="toggleCart()" aria-label="Warenkorb öffnen">
                     <i class="fa-solid fa-shopping-cart"></i>
-                    <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+                    <span class="cart-badge" id="cart-badge">0</span>
                 </button>
-                <button class="btn-lang"><span class="flag">🇩🇪</span><span>DE</span><i class="fa-solid fa-chevron-down"></i></button>
-                <button class="btn-login"><i class="fa-solid fa-user"></i><span>Anmelden</span></button>
+                <button class="btn-lang" aria-label="Sprache wechseln"><span class="flag">🇩🇪</span><span>DE</span><i class="fa-solid fa-chevron-down"></i></button>
+                <button class="btn-login" aria-label="Anmelden"><i class="fa-solid fa-user"></i><span>Anmelden</span></button>
             </div>
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menü öffnen">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
     </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav-overlay" onclick="toggleMobileMenu()"></div>
+    <nav class="mobile-nav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-plane"></i></div>
+                <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
+            </div>
+            <button class="mobile-nav-close" onclick="toggleMobileMenu()" aria-label="Menü schließen">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="index.html" class="mobile-nav-link"><i class="fa-solid fa-plane-departure"></i><span>Flüge</span></a>
+            <a href="hotels.html" class="mobile-nav-link active"><i class="fa-solid fa-hotel"></i><span>Hotels</span></a>
+            <a href="mietwagen.html" class="mobile-nav-link"><i class="fa-solid fa-car"></i><span>Mietwagen</span></a>
+            <a href="aktivitaeten.html" class="mobile-nav-link"><i class="fa-solid fa-ticket"></i><span>Aktivitäten</span></a>
+        </div>
+        <div class="mobile-nav-footer">
+            <button class="btn-login" aria-label="Anmelden"><i class="fa-solid fa-user"></i><span>Anmelden</span></button>
+        </div>
+    </nav>
 
     <section class="hero">
         <div class="hero-content">
@@ -53,6 +79,26 @@
             </div>
         </div>
     </section>
+
+    <!-- Trust Bar (Booking.com style) -->
+    <div class="trust-bar">
+        <div class="trust-item">
+            <i class="fa-solid fa-check-circle"></i>
+            <span><span class="trust-number">1M+</span> Hotels weltweit</span>
+        </div>
+        <div class="trust-item">
+            <i class="fa-solid fa-star"></i>
+            <span><span class="trust-number">10M+</span> Bewertungen</span>
+        </div>
+        <div class="trust-item">
+            <i class="fa-solid fa-ban"></i>
+            <span>Kostenlose Stornierung</span>
+        </div>
+        <div class="trust-item">
+            <i class="fa-solid fa-tag"></i>
+            <span>Bestpreisgarantie</span>
+        </div>
+    </div>
 
     <main class="main-container">
         <div class="search-section">
@@ -106,8 +152,44 @@
                 <button class="filter-btn" onclick="sortHotels(2); setActiveFilter(this)"><i class="fa-solid fa-trophy"></i> Beste Bewertung</button>
             </div>
 
-            <div id="loading" class="loading-indicator" style="display: none;">
-                <div class="loading-content"><i class="fa-solid fa-hotel fa-bounce"></i><p>Suche Hotels...</p></div>
+            <div id="loading" style="display: none;">
+                <div class="search-progress">
+                    <div class="progress-steps">
+                        <div class="step active" id="hotel-step-search">
+                            <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span>Suche</span>
+                        </div>
+                        <div class="step" id="hotel-step-compare">
+                            <div class="step-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                            <span>Vergleiche</span>
+                        </div>
+                        <div class="step" id="hotel-step-results">
+                            <div class="step-icon"><i class="fa-solid fa-check"></i></div>
+                            <span>Ergebnisse</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="hotel-progress-fill" style="width: 10%"></div>
+                    </div>
+                    <p class="progress-text" id="hotel-progress-text">Durchsuche 1M+ Hotels...</p>
+                </div>
+                <div class="skeleton-container">
+                    <div class="skeleton-hotel">
+                        <div class="sk-image"></div>
+                        <div class="sk-content"><div class="sk-title"></div><div class="sk-subtitle"></div><div class="sk-rating"></div><div class="sk-amenities"><div class="sk-amenity"></div><div class="sk-amenity"></div><div class="sk-amenity"></div></div></div>
+                        <div class="sk-price-section"><div class="sk-h-price"></div><div class="sk-h-note"></div></div>
+                    </div>
+                    <div class="skeleton-hotel">
+                        <div class="sk-image"></div>
+                        <div class="sk-content"><div class="sk-title"></div><div class="sk-subtitle"></div><div class="sk-rating"></div><div class="sk-amenities"><div class="sk-amenity"></div><div class="sk-amenity"></div></div></div>
+                        <div class="sk-price-section"><div class="sk-h-price"></div><div class="sk-h-note"></div></div>
+                    </div>
+                    <div class="skeleton-hotel">
+                        <div class="sk-image"></div>
+                        <div class="sk-content"><div class="sk-title"></div><div class="sk-subtitle"></div><div class="sk-rating"></div><div class="sk-amenities"><div class="sk-amenity"></div><div class="sk-amenity"></div><div class="sk-amenity"></div></div></div>
+                        <div class="sk-price-section"><div class="sk-h-price"></div><div class="sk-h-note"></div></div>
+                    </div>
+                </div>
             </div>
 
             <div id="results" class="results-container"></div>
@@ -142,7 +224,7 @@
             <div id="chat-messages" class="chat-messages"></div>
             <div class="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Schreibe eine Nachricht..." onkeypress="handleChatEnter(event)">
-                <button onclick="sendChat()" class="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                <button onclick="sendChat()" class="chat-send-btn" aria-label="Nachricht senden"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </aside>
     </main>
@@ -155,15 +237,16 @@
             </div>
             <div class="footer-links"><a href="#">Über uns</a><a href="#">Datenschutz</a><a href="#">Impressum</a><a href="#">Kontakt</a></div>
             <div class="footer-social">
-                <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#" class="social-link" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="social-link" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
         <div class="footer-bottom"><p>© 2026 FlyAI – Mit <i class="fa-solid fa-heart"></i> entwickelt</p></div>
     </footer>
 
-    <script src="hotel-app.js?v=2"></script>
+    <script src="flyai-shared.js?v=1"></script>
+    <script src="hotel-app.js?v=3"></script>
     <script>
         function setActiveFilter(btn) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));

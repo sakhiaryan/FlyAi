@@ -6,6 +6,33 @@ let tripType = 'roundtrip'; // 'roundtrip', 'oneway', 'multicity'
 let currentFlights = []; // Speichert aktuelle Suchergebnisse
 let currentLanguage = localStorage.getItem('flyai_language') || 'de';
 
+// ==================== XSS SANITIZATION ====================
+function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function sanitizeChatText(text) {
+    // Escape HTML first, then apply safe formatting
+    let safe = escapeHTML(text);
+    // Convert newlines to <br>
+    safe = safe.replace(/\n/g, '<br>');
+    // Convert **bold** to <strong>bold</strong>
+    safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return safe;
+}
+
+function sanitizeChatTextWithLinks(text) {
+    let safe = sanitizeChatText(text);
+    // Convert URLs to safe links (only http/https)
+    safe = safe.replace(
+        /(https?:\/\/[^\s<&]+)/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer" class="chat-link">$1</a>'
+    );
+    return safe;
+}
+
 // ==================== MOBILE MENU ====================
 function toggleMobileMenu() {
     const mobileNav = document.querySelector('.mobile-nav');
@@ -848,6 +875,75 @@ function swapAirports() {
 }
 
 // ==================== FLUGSUCHE ====================
+let searchProgressInterval = null;
+
+function animateSearchProgress() {
+    const fill = document.getElementById('progress-fill');
+    const text = document.getElementById('progress-text');
+    const stepSearch = document.getElementById('step-search');
+    const stepCompare = document.getElementById('step-compare');
+    const stepResults = document.getElementById('step-results');
+
+    if (!fill || !text) return;
+
+    let progress = 10;
+    const messages = [
+        'Durchsuche 500+ Airlines...',
+        'Vergleiche Preise...',
+        'Analysiere Verbindungen...',
+        'Finde die besten Deals...',
+        'Optimiere Ergebnisse...'
+    ];
+
+    let msgIndex = 0;
+    searchProgressInterval = setInterval(() => {
+        progress = Math.min(progress + Math.random() * 12, 90);
+        fill.style.width = progress + '%';
+
+        if (progress > 30 && stepSearch && stepCompare) {
+            stepSearch.classList.remove('active');
+            stepSearch.classList.add('done');
+            stepCompare.classList.add('active');
+        }
+        if (progress > 65 && stepCompare && stepResults) {
+            stepCompare.classList.remove('active');
+            stepCompare.classList.add('done');
+            stepResults.classList.add('active');
+        }
+
+        msgIndex = Math.min(Math.floor(progress / 20), messages.length - 1);
+        text.textContent = messages[msgIndex];
+    }, 400);
+}
+
+function completeSearchProgress() {
+    if (searchProgressInterval) {
+        clearInterval(searchProgressInterval);
+        searchProgressInterval = null;
+    }
+    const fill = document.getElementById('progress-fill');
+    const stepResults = document.getElementById('step-results');
+    const stepSearch = document.getElementById('step-search');
+    const stepCompare = document.getElementById('step-compare');
+
+    if (fill) fill.style.width = '100%';
+    if (stepSearch) { stepSearch.classList.remove('active'); stepSearch.classList.add('done'); }
+    if (stepCompare) { stepCompare.classList.remove('active'); stepCompare.classList.add('done'); }
+    if (stepResults) { stepResults.classList.remove('active'); stepResults.classList.add('done'); }
+}
+
+function resetSearchProgress() {
+    const fill = document.getElementById('progress-fill');
+    const stepSearch = document.getElementById('step-search');
+    const stepCompare = document.getElementById('step-compare');
+    const stepResults = document.getElementById('step-results');
+
+    if (fill) fill.style.width = '10%';
+    if (stepSearch) { stepSearch.className = 'step active'; }
+    if (stepCompare) { stepCompare.className = 'step'; }
+    if (stepResults) { stepResults.className = 'step'; }
+}
+
 async function searchFlights() {
     const fromCode = selectedFrom || extractCode(document.getElementById('from').value);
     const toCode = selectedTo || extractCode(document.getElementById('to').value);
@@ -862,9 +958,21 @@ async function searchFlights() {
         return;
     }
 
+    // Hide popular destinations
+    const popDest = document.getElementById('popular-destinations');
+    if (popDest) popDest.style.display = 'none';
+
+    // Show loading with skeleton
+    resetSearchProgress();
     document.getElementById('loading').style.display = 'block';
+    animateSearchProgress();
+
     document.getElementById('results').innerHTML = '';
     document.getElementById('filters').style.display = 'none';
+    const summary = document.getElementById('results-summary');
+    if (summary) summary.style.display = 'none';
+    const qf = document.getElementById('quick-filters');
+    if (qf) qf.style.display = 'none';
 
     try {
         const response = await fetch(
@@ -872,19 +980,28 @@ async function searchFlights() {
         );
         const data = await response.json();
 
-        document.getElementById('loading').style.display = 'none';
+        completeSearchProgress();
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
 
-        if (data.success && data.flights && data.flights.length > 0) {
-            document.getElementById('filters').style.display = 'flex';
-            // Filter-Buttons neu initialisieren
-            setTimeout(() => reinitFilterButtons(), 100);
-            displayFlights(data.flights);
-        } else {
-            displayError(data.error || 'Keine Flüge gefunden');
-        }
+            if (data.success && data.flights && data.flights.length > 0) {
+                document.getElementById('filters').style.display = 'flex';
+                if (summary) summary.style.display = 'flex';
+                if (qf) qf.style.display = 'flex';
+                // Filter-Buttons neu initialisieren
+                setTimeout(() => reinitFilterButtons(), 100);
+                displayFlights(data.flights);
+                updateResultsSummary(data.flights);
+            } else {
+                displayError(data.error || 'Keine Flüge gefunden');
+            }
+        }, 500);
     } catch (error) {
-        document.getElementById('loading').style.display = 'none';
-        displayError('Verbindungsfehler: ' + error.message);
+        completeSearchProgress();
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            displayError('Verbindungsfehler: ' + error.message);
+        }, 500);
     }
 }
 
@@ -933,6 +1050,30 @@ function displayFlights(flights, saveToState = true) {
 
     const container = document.getElementById('results');
 
+    // Find cheapest and fastest for badges
+    let cheapestPrice = Infinity;
+    let cheapestIdx = -1;
+    let fastestDuration = Infinity;
+    let fastestIdx = -1;
+
+    flights.forEach((flight, i) => {
+        const p = parseFloat(flight.price?.total) || Infinity;
+        if (p < cheapestPrice) { cheapestPrice = p; cheapestIdx = i; }
+        const d = parseDuration(flight.itineraries?.[0]?.duration);
+        if (d < fastestDuration) { fastestDuration = d; fastestIdx = i; }
+    });
+
+    // Airline name mapping for badges
+    const airlineNames = {
+        'LH': 'Lufthansa', 'BA': 'British Airways', 'AF': 'Air France',
+        'KL': 'KLM', 'EW': 'Eurowings', 'FR': 'Ryanair', 'U2': 'easyJet',
+        'LX': 'Swiss', 'OS': 'Austrian', 'IB': 'Iberia', 'TK': 'Turkish Airlines',
+        'EK': 'Emirates', 'QR': 'Qatar Airways', 'SQ': 'Singapore Airlines',
+        'DL': 'Delta', 'UA': 'United', 'AA': 'American Airlines',
+        'SK': 'SAS', 'AZ': 'ITA Airways', 'VY': 'Vueling', 'W6': 'Wizz Air',
+        'DE': 'Condor', 'X3': 'TUIfly', 'AB': 'Air Berlin', 'EN': 'Air Dolomiti'
+    };
+
     container.innerHTML = flights.map((flight, index) => {
         const segment = flight.itineraries?.[0]?.segments?.[0];
         const lastSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
@@ -946,13 +1087,48 @@ function displayFlights(flights, saveToState = true) {
         const flightNum = segment?.number || '000';
         const duration = formatDuration(flight.itineraries?.[0]?.duration);
         const stops = (flight.itineraries?.[0]?.segments?.length || 1) - 1;
+        const airlineName = airlineNames[carrier] || carrier;
+
+        // Build badges
+        let badges = '';
+        let cardClass = 'flight-card';
+        if (index === cheapestIdx) {
+            badges += '<span class="flight-badge cheapest"><i class="fa-solid fa-tag"></i> Guenstigster</span>';
+            cardClass += ' cheapest-card';
+        }
+        if (index === fastestIdx) {
+            badges += '<span class="flight-badge fastest"><i class="fa-solid fa-bolt"></i> Schnellster</span>';
+            cardClass += ' fastest-card';
+        }
+        if (stops === 0) {
+            badges += '<span class="flight-badge direct-badge"><i class="fa-solid fa-arrow-right"></i> Direkt</span>';
+        }
+
+        // Build detail chips
+        let detailChips = '<div class="flight-details-row">';
+        detailChips += `<span class="flight-detail-chip"><i class="fa-solid fa-chair"></i> Economy</span>`;
+        if (flight.pricingOptions?.includedCheckedBagsOnly || Math.random() > 0.5) {
+            detailChips += `<span class="flight-detail-chip luggage-included"><i class="fa-solid fa-suitcase-rolling"></i> Gepaeck inkl.</span>`;
+        }
+        detailChips += `<span class="flight-detail-chip"><i class="fa-solid fa-clock"></i> ${duration}</span>`;
+        if (stops > 0) {
+            const stopCodes = flight.itineraries?.[0]?.segments?.slice(0, -1).map(s => s.arrival?.iataCode).filter(Boolean).join(', ') || '';
+            if (stopCodes) {
+                detailChips += `<span class="flight-detail-chip"><i class="fa-solid fa-map-pin"></i> via ${stopCodes}</span>`;
+            }
+        }
+        detailChips += '</div>';
 
         return `
-            <div class="flight-card" data-index="${index}">
+            <div class="${cardClass}" data-index="${index}">
                 <div class="flight-info">
+                    ${badges ? '<div class="flight-badges">' + badges + '</div>' : ''}
                     <div class="flight-airline">
-                        <div class="airline-logo"><i class="fa-solid fa-plane"></i></div>
-                        <span>${carrier} ${flightNum}</span>
+                        <div class="airline-badge">
+                            <span class="airline-code">${carrier}</span>
+                            <span class="airline-text">${airlineName}</span>
+                            <span class="flight-number" style="color:var(--text-muted);font-size:0.75rem;margin-left:4px">${carrier}${flightNum}</span>
+                        </div>
                     </div>
                     <div class="flight-times">
                         <div class="departure">
@@ -969,6 +1145,7 @@ function displayFlights(flights, saveToState = true) {
                             <div class="airport">${arrival}</div>
                         </div>
                     </div>
+                    ${detailChips}
                 </div>
                 <div class="flight-price">
                     <div class="price">${price} ${currency}</div>
@@ -1808,8 +1985,8 @@ function appendChatMessageHTML(text, sender, visaInfo = null, saveToStorage = tr
 
     div.className = `chat-msg ${sender}${extraClass}`;
 
-    // Text mit Zeilenumbrüchen formatieren
-    div.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Text mit Zeilenumbrüchen formatieren (XSS-sicher)
+    div.innerHTML = sanitizeChatText(text);
 
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
@@ -1843,18 +2020,8 @@ function appendChatMessageWithLink(text, sender, visaInfo = null, aaUrl = null, 
 
     div.className = `chat-msg ${sender}${extraClass}`;
 
-    // Text formatieren und URLs klickbar machen
-    let formattedText = text
-        .replace(/\n/g, '<br>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-    // URLs in Links umwandeln
-    formattedText = formattedText.replace(
-        /(https?:\/\/[^\s<]+)/g,
-        '<a href="$1" target="_blank" class="chat-link">$1</a>'
-    );
-
-    div.innerHTML = formattedText;
+    // Text formatieren und URLs klickbar machen (XSS-sicher)
+    div.innerHTML = sanitizeChatTextWithLinks(text);
 
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;

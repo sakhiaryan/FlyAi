@@ -1,11 +1,14 @@
 import httpx
 import os
 import random
+import logging
 from dotenv import load_dotenv
 from typing import Optional, Dict, List
 from datetime import datetime, timedelta
 
 load_dotenv()
+
+logger = logging.getLogger("flyai.hotel")
 
 RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
 RAPIDAPI_HOST = "sky-scrapper.p.rapidapi.com"
@@ -397,7 +400,7 @@ async def search_hotels(
 
                 # Bei Rate Limit oder Fehler -> Mock-Daten
                 if response.status_code == 429:
-                    print("Hotel API Rate Limit - nutze Mock-Daten")
+                    logger.warning("Hotel API rate limit - falling back to mock data")
 
             # Fallback auf Mock-Daten
             hotels = generate_mock_hotels(destination, checkin, checkout, adults)
@@ -411,7 +414,7 @@ async def search_hotels(
             }
 
         except Exception as e:
-            print(f"Hotel API Error: {e}")
+            logger.error("Hotel API error: %s", e)
             # Fallback auf Mock
             hotels = generate_mock_hotels(destination, checkin, checkout, adults)
             return {

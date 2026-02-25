@@ -1,11 +1,14 @@
 import httpx
 import os
 import random
+import logging
 from dotenv import load_dotenv
 from typing import Optional, Dict, List
 from datetime import datetime, timedelta
 
 load_dotenv()
+
+logger = logging.getLogger("flyai.skyscanner")
 
 RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
 RAPIDAPI_HOST = "sky-scrapper.p.rapidapi.com"
@@ -217,7 +220,7 @@ async def search_airport(query: str) -> Optional[Dict]:
                         "_isMock": True
                     }
     except Exception as e:
-        print(f"API Fehler: {e}")
+        logger.error("Airport search API error: %s", e)
 
     # Fallback zu lokalen Daten
     if local_airport:
@@ -307,7 +310,7 @@ async def search_flights_skyscanner(
                         use_mock = True  # Rate Limit - nutze Mock
 
             except Exception as e:
-                print(f"Skyscanner API Fehler: {e}")
+                logger.error("Skyscanner flights API error: %s", e)
                 use_mock = True
 
         # Mock-Daten generieren
@@ -394,7 +397,7 @@ def parse_skyscanner_response(data: Dict) -> List[Dict]:
             flights.append(flight)
 
         except Exception as e:
-            print(f"Fehler beim Parsen eines Flugs: {e}")
+            logger.warning("Failed to parse flight itinerary: %s", e)
             continue
 
     # Nach Preis sortieren

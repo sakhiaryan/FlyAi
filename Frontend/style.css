@@ -1393,9 +1393,14 @@ body::before {
     .trip-toggle { flex-direction: column; }
     .trip-option { justify-content: center; }
     .filters { flex-direction: column; align-items: stretch; }
-    .filter-buttons { justify-content: center; }
+    .filter-buttons { justify-content: center; flex-wrap: wrap; }
     .chat-intro { padding: 0.85rem 1rem; }
     .intro-tags { justify-content: center; }
+    .search-btn { width: calc(100% - 2rem); margin: 0 1rem 1rem; }
+    .search-fields { padding: 1rem; }
+    .search-box-header { padding: 0.85rem 1rem; }
+    .trip-toggle { padding: 1rem 1rem 0; }
+    .chat-input-container { padding: 0.85rem 1rem; }
 }
 
 /* ========== SCROLLBAR ========== */
@@ -1410,6 +1415,25 @@ body::before {
 ::selection {
     background: rgba(90, 200, 250, 0.25);
     color: var(--text-white);
+}
+
+/* ========== FOCUS VISIBLE — ACCESSIBILITY ========== */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Skip focus outline for mouse users */
+:focus:not(:focus-visible) {
+    outline: none;
 }
 
 /* ========== TOAST NOTIFICATIONS ========== */
@@ -3471,5 +3495,1001 @@ body::before {
         align-items: center;
         border-left: none;
         border-top: 1px solid var(--glass-border);
+    }
+    .hotel-image img { loading: lazy; }
+}
+
+@media (max-width: 480px) {
+    .hotel-image { height: 160px; }
+    .hotel-info { padding: 0.75rem 1rem; }
+    .hotel-name { font-size: 0.95rem; }
+}
+
+/* ================================================================
+   UX IMPROVEMENTS — Inspired by Google Flights, Skyscanner,
+   Booking.com, Kayak, Momondo, Expedia, Hopper, Kiwi.com
+   ================================================================ */
+
+/* ========== SKELETON LOADING (Booking.com style) ========== */
+.skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-top: 1rem;
+}
+
+.skeleton-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-lg);
+    padding: 1.35rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    animation: skeletonPulse 1.8s ease-in-out infinite;
+}
+
+.skeleton-card .sk-airline {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.85rem;
+}
+
+.skeleton-card .sk-logo {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--r-sm);
+}
+
+.skeleton-card .sk-text {
+    height: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+}
+
+.skeleton-card .sk-text-sm {
+    width: 60px;
+}
+
+.skeleton-card .sk-text-md {
+    width: 100px;
+}
+
+.skeleton-card .sk-text-lg {
+    width: 140px;
+}
+
+.skeleton-card .sk-times {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.skeleton-card .sk-time-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+}
+
+.skeleton-card .sk-time {
+    width: 50px;
+    height: 22px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+}
+
+.skeleton-card .sk-airport {
+    width: 30px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+}
+
+.skeleton-card .sk-line-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 80px;
+}
+
+.skeleton-card .sk-duration {
+    width: 50px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+}
+
+.skeleton-card .sk-line {
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+}
+
+.skeleton-card .sk-stops {
+    width: 40px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+}
+
+.skeleton-card .sk-price-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.skeleton-card .sk-price {
+    width: 80px;
+    height: 28px;
+    background: rgba(90, 200, 250, 0.08);
+    border-radius: 6px;
+}
+
+.skeleton-card .sk-price-note {
+    width: 60px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.skeleton-card .sk-btn {
+    width: 90px;
+    height: 36px;
+    background: rgba(90, 200, 250, 0.1);
+    border-radius: var(--r-md);
+}
+
+@keyframes skeletonPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Skeleton for hotel cards */
+.skeleton-hotel {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    display: flex;
+    margin-bottom: 0.85rem;
+    border: 1px solid var(--glass-border);
+    animation: skeletonPulse 1.8s ease-in-out infinite;
+}
+
+.skeleton-hotel .sk-image {
+    width: 220px;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.skeleton-hotel .sk-content {
+    flex: 1;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.skeleton-hotel .sk-title {
+    width: 70%;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+}
+
+.skeleton-hotel .sk-subtitle {
+    width: 50%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+}
+
+.skeleton-hotel .sk-rating {
+    width: 40%;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+}
+
+.skeleton-hotel .sk-amenities {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+}
+
+.skeleton-hotel .sk-amenity {
+    width: 60px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.skeleton-hotel .sk-price-section {
+    width: 170px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    border-left: 1px solid var(--glass-border);
+}
+
+.skeleton-hotel .sk-h-price {
+    width: 70px;
+    height: 22px;
+    background: rgba(90, 200, 250, 0.08);
+    border-radius: 5px;
+}
+
+.skeleton-hotel .sk-h-note {
+    width: 50px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+/* ========== ENHANCED FLIGHT CARDS (Google Flights / Skyscanner style) ========== */
+
+/* Flight card badge system */
+.flight-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: var(--r-full);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.flight-badge.cheapest {
+    background: rgba(48, 209, 88, 0.12);
+    color: var(--success);
+    border: 1px solid rgba(48, 209, 88, 0.25);
+}
+
+.flight-badge.fastest {
+    background: rgba(90, 200, 250, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(90, 200, 250, 0.25);
+}
+
+.flight-badge.best {
+    background: rgba(191, 90, 242, 0.12);
+    color: var(--accent-purple-light);
+    border: 1px solid rgba(191, 90, 242, 0.25);
+}
+
+.flight-badge.direct-badge {
+    background: rgba(48, 209, 88, 0.12);
+    color: var(--success);
+    border: 1px solid rgba(48, 209, 88, 0.25);
+}
+
+/* Flight card header badges row */
+.flight-badges {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+}
+
+/* Enhanced airline display */
+.airline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-full);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+
+.airline-badge .airline-code {
+    width: auto;
+    height: auto;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    background: var(--gradient-accent);
+    color: #fff;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+}
+
+.airline-badge .airline-text {
+    color: var(--text-white);
+    font-weight: 600;
+}
+
+/* Improved price display (all top travel sites) */
+.flight-price .price {
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.flight-price .price-was {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    margin-bottom: 2px;
+}
+
+.flight-price .price-savings {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--success);
+    padding: 2px 8px;
+    background: rgba(48, 209, 88, 0.1);
+    border-radius: var(--r-full);
+    margin-bottom: 4px;
+}
+
+/* Enhanced flight card hover with left border accent */
+.flight-card {
+    border-left: 3px solid transparent;
+    transition: all 0.35s var(--ease), border-left-color 0.35s var(--ease);
+}
+
+.flight-card:hover {
+    border-left-color: var(--accent);
+}
+
+.flight-card.cheapest-card {
+    border-left-color: var(--success);
+}
+
+.flight-card.fastest-card {
+    border-left-color: var(--accent);
+}
+
+/* Flight card expanded details (Skyscanner-style) */
+.flight-details-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    flex-wrap: wrap;
+}
+
+.flight-detail-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--r-full);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.flight-detail-chip i {
+    font-size: 0.7rem;
+    color: var(--accent);
+}
+
+.flight-detail-chip.luggage-included {
+    color: var(--success);
+    border-color: rgba(48, 209, 88, 0.15);
+    background: rgba(48, 209, 88, 0.05);
+}
+
+.flight-detail-chip.luggage-included i {
+    color: var(--success);
+}
+
+/* ========== RESULT SUMMARY BAR (Google Flights style) ========== */
+.results-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.results-count {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+
+.results-count strong {
+    color: var(--text-white);
+    font-weight: 700;
+}
+
+.results-price-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+.results-price-range .from-price {
+    font-weight: 700;
+    color: var(--success);
+    font-family: 'Clash Display', 'Outfit', sans-serif;
+    font-size: 1rem;
+}
+
+.results-price-range .price-label-sm {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+
+/* ========== QUICK FILTER CHIPS (Skyscanner / Kayak style) ========== */
+.quick-filters {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: wrap;
+}
+
+.quick-filters::-webkit-scrollbar { display: none; }
+
+.quick-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-full);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.quick-filter-chip:hover {
+    background: rgba(90, 200, 250, 0.08);
+    border-color: rgba(90, 200, 250, 0.2);
+    color: var(--accent);
+}
+
+.quick-filter-chip.active {
+    background: rgba(90, 200, 250, 0.12);
+    border-color: rgba(90, 200, 250, 0.3);
+    color: var(--accent);
+}
+
+.quick-filter-chip i {
+    font-size: 0.78rem;
+}
+
+.quick-filter-chip .chip-price {
+    font-weight: 700;
+    color: var(--accent);
+    margin-left: 2px;
+}
+
+/* ========== TRUST INDICATORS (Booking.com / Expedia style) ========== */
+.trust-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    margin: 0 2.5rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+.trust-item i {
+    font-size: 1rem;
+    color: var(--success);
+}
+
+.trust-item .trust-number {
+    font-weight: 700;
+    color: var(--text-white);
+}
+
+/* ========== SEARCH FORM IMPROVEMENTS (Google Flights style) ========== */
+
+/* Class toggle indicator */
+.cabin-class-selector {
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.5rem 1.75rem 0;
+}
+
+.cabin-class-btn {
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--r-full);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    font-family: inherit;
+}
+
+.cabin-class-btn:hover {
+    color: var(--text-dim);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.cabin-class-btn.active {
+    color: var(--accent);
+    border-color: rgba(90, 200, 250, 0.3);
+    background: rgba(90, 200, 250, 0.08);
+}
+
+/* Improved search button with price hint */
+.search-btn-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1.75rem 1.75rem;
+}
+
+.search-btn-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.search-btn-hint i {
+    color: var(--success);
+    font-size: 0.75rem;
+}
+
+/* ========== POPULAR DESTINATIONS (Airbnb / Google Flights style) ========== */
+.popular-destinations {
+    margin-top: 1.5rem;
+}
+
+.popular-destinations h3 {
+    font-family: 'Clash Display', 'Outfit', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.popular-destinations h3 i {
+    color: var(--accent);
+    font-size: 0.9rem;
+}
+
+.destinations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+.destination-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-lg);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.35s var(--ease);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.destination-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10px;
+    right: 10px;
+    height: 1px;
+    background: var(--gradient-prismatic);
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+}
+
+.destination-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(90, 200, 250, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.destination-card:hover::before {
+    opacity: 0.4;
+}
+
+.destination-emoji {
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.destination-city {
+    font-weight: 700;
+    color: var(--text-white);
+    font-size: 0.92rem;
+}
+
+.destination-country {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.destination-price {
+    font-family: 'Clash Display', 'Outfit', sans-serif;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.92rem;
+    margin-top: 0.25rem;
+}
+
+.destination-price span {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+/* ========== ENHANCED HOTEL CARDS — Trust Indicators (Booking.com style) ========== */
+.hotel-trust-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+.hotel-trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    font-size: 0.68rem;
+    font-weight: 600;
+}
+
+.hotel-trust-badge.free-cancel {
+    background: rgba(48, 209, 88, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(48, 209, 88, 0.2);
+}
+
+.hotel-trust-badge.breakfast {
+    background: rgba(255, 159, 10, 0.1);
+    color: var(--accent-warm);
+    border: 1px solid rgba(255, 159, 10, 0.2);
+}
+
+.hotel-trust-badge.top-rated {
+    background: rgba(191, 90, 242, 0.1);
+    color: var(--accent-purple-light);
+    border: 1px solid rgba(191, 90, 242, 0.2);
+}
+
+.hotel-trust-badge.limited {
+    background: rgba(255, 55, 95, 0.1);
+    color: var(--accent-pink);
+    border: 1px solid rgba(255, 55, 95, 0.2);
+}
+
+/* Hotel rating text descriptions (Booking.com style) */
+.rating-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.rating-label.excellent { color: var(--success); }
+.rating-label.very-good { color: var(--accent); }
+.rating-label.good { color: var(--accent-warm); }
+
+/* ========== MICRO-INTERACTIONS ========== */
+
+/* Card entrance animation */
+.flight-card, .hotel-card {
+    animation: cardSlideIn 0.4s var(--ease) backwards;
+}
+
+.flight-card:nth-child(1), .hotel-card:nth-child(1) { animation-delay: 0.05s; }
+.flight-card:nth-child(2), .hotel-card:nth-child(2) { animation-delay: 0.1s; }
+.flight-card:nth-child(3), .hotel-card:nth-child(3) { animation-delay: 0.15s; }
+.flight-card:nth-child(4), .hotel-card:nth-child(4) { animation-delay: 0.2s; }
+.flight-card:nth-child(5), .hotel-card:nth-child(5) { animation-delay: 0.25s; }
+.flight-card:nth-child(6), .hotel-card:nth-child(6) { animation-delay: 0.3s; }
+.flight-card:nth-child(7), .hotel-card:nth-child(7) { animation-delay: 0.35s; }
+.flight-card:nth-child(8), .hotel-card:nth-child(8) { animation-delay: 0.4s; }
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth button press effect */
+.select-btn:active,
+.search-btn:active,
+.filter-btn:active {
+    transform: scale(0.97);
+}
+
+/* Pulse animation for urgency badges */
+.urgency-pulse {
+    animation: urgencyPulse 2s ease-in-out infinite;
+}
+
+@keyframes urgencyPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Swap button enhanced animation */
+.swap-btn {
+    transition: all 0.4s var(--spring);
+}
+
+.swap-btn:active {
+    transform: rotate(180deg) scale(0.9);
+}
+
+/* Filter slide animation */
+.filters {
+    animation: filterSlideIn 0.35s var(--ease);
+}
+
+@keyframes filterSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== SEARCH PROGRESS BAR (Hopper / Kiwi style) ========== */
+.search-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--r-xl);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--glass-border);
+    text-align: center;
+}
+
+.search-progress .progress-steps {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.search-progress .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    transition: color 0.3s var(--ease);
+}
+
+.search-progress .step.active {
+    color: var(--accent);
+}
+
+.search-progress .step.done {
+    color: var(--success);
+}
+
+.search-progress .step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: all 0.3s var(--ease);
+}
+
+.search-progress .step.active .step-icon {
+    background: rgba(90, 200, 250, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+    animation: stepPulse 1.5s ease-in-out infinite;
+}
+
+.search-progress .step.done .step-icon {
+    background: rgba(48, 209, 88, 0.1);
+    border-color: var(--success);
+    color: var(--success);
+}
+
+@keyframes stepPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(90, 200, 250, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(90, 200, 250, 0); }
+}
+
+.search-progress .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--r-full);
+    overflow: hidden;
+}
+
+.search-progress .progress-fill {
+    height: 100%;
+    background: var(--gradient-accent);
+    border-radius: var(--r-full);
+    transition: width 0.5s var(--ease);
+    animation: progressShimmer 2s linear infinite;
+    background-size: 200% 100%;
+}
+
+@keyframes progressShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.search-progress .progress-text {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+/* ========== ENHANCED HOTEL SEARCH — Rating Stars ========== */
+.star-rating {
+    display: inline-flex;
+    gap: 2px;
+}
+
+.star-rating i {
+    font-size: 0.75rem;
+}
+
+.star-rating i.filled {
+    color: var(--accent-warm);
+}
+
+.star-rating i.empty {
+    color: var(--text-muted);
+    opacity: 0.3;
+}
+
+/* ========== RESPONSIVE ADDITIONS ========== */
+@media (max-width: 900px) {
+    .trust-bar {
+        margin: 0 1.25rem 1rem;
+        gap: 1rem;
+        padding: 0.85rem 1rem;
+    }
+
+    .trust-item {
+        font-size: 0.75rem;
+    }
+
+    .popular-destinations {
+        margin-top: 1rem;
+    }
+
+    .destinations-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .results-summary {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .skeleton-card {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .skeleton-card .sk-price-block {
+        align-items: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .trust-bar {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .destinations-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .destination-card {
+        padding: 0.75rem;
+    }
+
+    .quick-filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .cabin-class-selector {
+        padding: 0.5rem 1rem 0;
+        flex-wrap: wrap;
+    }
+
+    .skeleton-hotel {
+        flex-direction: column;
+    }
+
+    .skeleton-hotel .sk-image {
+        width: 100%;
+        height: 140px;
+    }
+
+    .skeleton-hotel .sk-price-section {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--glass-border);
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 }

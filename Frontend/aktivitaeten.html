@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FlyAI - Finde und buche die besten Touren, Ausflüge und Erlebnisse an deinem Reiseziel.">
+    <meta name="theme-color" content="#0a0a0f">
     <title>FlyAI - Aktivitäten & Erlebnisse</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
     <link rel="stylesheet" href="style.css?v=9">
     <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -44,25 +47,48 @@
                 </a>
             </nav>
             <div class="header-actions">
-                <button class="btn-cart" onclick="window.location.href='index.html'">
+                <button class="btn-cart" onclick="toggleCart()" aria-label="Warenkorb öffnen">
                     <i class="fa-solid fa-shopping-cart"></i>
-                    <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+                    <span class="cart-badge" id="cart-badge">0</span>
                 </button>
-                <button class="btn-lang">
+                <button class="btn-lang" aria-label="Sprache wechseln">
                     <span class="flag">🇩🇪</span>
                     <span>DE</span>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
-                <button class="btn-login">
+                <button class="btn-login" aria-label="Anmelden">
                     <i class="fa-solid fa-user"></i>
                     <span>Anmelden</span>
                 </button>
             </div>
-            <button class="mobile-menu-btn">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menü öffnen">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
     </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav-overlay" onclick="toggleMobileMenu()"></div>
+    <nav class="mobile-nav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-plane"></i></div>
+                <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
+            </div>
+            <button class="mobile-nav-close" onclick="toggleMobileMenu()" aria-label="Menü schließen">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="index.html" class="mobile-nav-link"><i class="fa-solid fa-plane-departure"></i><span>Flüge</span></a>
+            <a href="hotels.html" class="mobile-nav-link"><i class="fa-solid fa-hotel"></i><span>Hotels</span></a>
+            <a href="mietwagen.html" class="mobile-nav-link"><i class="fa-solid fa-car"></i><span>Mietwagen</span></a>
+            <a href="aktivitaeten.html" class="mobile-nav-link active"><i class="fa-solid fa-ticket"></i><span>Aktivitäten</span></a>
+        </div>
+        <div class="mobile-nav-footer">
+            <button class="btn-login" aria-label="Anmelden"><i class="fa-solid fa-user"></i><span>Anmelden</span></button>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -251,7 +277,7 @@
             <div id="chat-messages" class="chat-messages"></div>
             <div class="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Schreibe eine Nachricht..." onkeypress="handleChatEnter(event)">
-                <button onclick="sendChat()" class="chat-send-btn">
+                <button onclick="sendChat()" class="chat-send-btn" aria-label="Nachricht senden">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
@@ -277,9 +303,9 @@
                 <a href="#">Kontakt</a>
             </div>
             <div class="footer-social">
-                <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#" class="social-link" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="social-link" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -287,8 +313,86 @@
         </div>
     </footer>
 
-    <script src="app.js?v=7"></script>
+    <script src="flyai-shared.js?v=1"></script>
     <script>
+        // ==================== DUMMY ACTIVITIES DATA ====================
+        const activityDatabase = [
+            {
+                id: 1,
+                name: 'Stadtfuehrung durch die Altstadt',
+                category: 'tours',
+                price: 25,
+                rating: 4.8,
+                reviews: 1247,
+                duration: '2.5 Stunden',
+                description: 'Entdecke die historische Altstadt mit einem erfahrenen Guide',
+                icon: 'fa-solid fa-person-walking',
+                features: ['Kleine Gruppen', 'Lokaler Guide', 'Kostenlose Stornierung']
+            },
+            {
+                id: 2,
+                name: 'Museum Eintrittskarte (Skip-the-line)',
+                category: 'museums',
+                price: 18,
+                rating: 4.6,
+                reviews: 3420,
+                duration: 'Ganzer Tag',
+                description: 'Kein Anstehen - direkt rein ins Museum',
+                icon: 'fa-solid fa-landmark',
+                features: ['Skip-the-line', 'Mobile Ticket', 'Sofortige Bestaetigung']
+            },
+            {
+                id: 3,
+                name: 'Abenteuer Kletterpark',
+                category: 'adventure',
+                price: 39,
+                rating: 4.9,
+                reviews: 856,
+                duration: '3 Stunden',
+                description: 'Klettere durch verschiedene Parcours in den Baumwipfeln',
+                icon: 'fa-solid fa-mountain',
+                features: ['Ausruestung inkl.', 'Alle Level', 'Instruktor dabei']
+            },
+            {
+                id: 4,
+                name: 'Food Tour: Lokale Spezialitaeten',
+                category: 'food',
+                price: 55,
+                rating: 4.7,
+                reviews: 2103,
+                duration: '3.5 Stunden',
+                description: 'Probiere die besten lokalen Gerichte an 6 verschiedenen Stops',
+                icon: 'fa-solid fa-utensils',
+                features: ['6 Verkostungen', 'Getraenke inkl.', 'Max. 12 Teilnehmer']
+            },
+            {
+                id: 5,
+                name: 'Kayak Tour auf dem Fluss',
+                category: 'water',
+                price: 45,
+                rating: 4.8,
+                reviews: 673,
+                duration: '2 Stunden',
+                description: 'Paddle durch die Stadt und geniesse die Aussicht vom Wasser',
+                icon: 'fa-solid fa-water',
+                features: ['Anfaenger willkommen', 'Ausruestung inkl.', 'Guide dabei']
+            },
+            {
+                id: 6,
+                name: 'Botanischer Garten Fuehrung',
+                category: 'nature',
+                price: 15,
+                rating: 4.5,
+                reviews: 1890,
+                duration: '1.5 Stunden',
+                description: 'Entdecke exotische Pflanzen und wunderschoene Gaerten',
+                icon: 'fa-solid fa-tree',
+                features: ['Experten-Guide', 'Familienfreundlich', 'Rollstuhlgerecht']
+            }
+        ];
+
+        let currentActivities = [];
+
         // Datum-Input setzen
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date();
@@ -301,12 +405,143 @@
         }
 
         function searchActivities() {
-            showToast('Aktivitäten-Suche wird bald verfügbar sein!', 'info');
+            const location = document.getElementById('activity-location').value.trim();
+            const category = document.getElementById('category').value;
+            const participants = document.getElementById('participants').value;
+
+            if (!location) {
+                showToast('Bitte gib ein Reiseziel ein!', 'error');
+                document.getElementById('activity-location').focus();
+                return;
+            }
+
+            // Hide coming-soon card
+            const comingSoon = document.querySelector('.coming-soon-card');
+            if (comingSoon) comingSoon.style.display = 'none';
+
+            // Hide categories
+            const cats = document.querySelector('.activity-categories');
+            if (cats) cats.style.display = 'none';
+
+            // Filter activities
+            let results = [...activityDatabase];
+            if (category !== 'all') {
+                results = results.filter(a => a.category === category);
+            }
+
+            // Adjust prices slightly based on location
+            const locHash = location.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+            results = results.map(a => ({
+                ...a,
+                price: Math.round(a.price * (0.8 + (locHash % 40) / 100)),
+                adjustedParticipants: parseInt(participants)
+            }));
+
+            currentActivities = results;
+
+            if (results.length === 0) {
+                document.getElementById('activity-results') || createResultsContainer();
+                getResultsContainer().innerHTML = `
+                    <div class="coming-soon-card">
+                        <div class="coming-soon-icon"><i class="fa-solid fa-ticket"></i></div>
+                        <h3>Keine Aktivitaeten gefunden</h3>
+                        <p>Versuche eine andere Kategorie oder ein anderes Reiseziel.</p>
+                    </div>`;
+                return;
+            }
+
+            renderActivities(results, location);
+            showToast(results.length + ' Aktivitaeten in ' + location + ' gefunden!', 'success');
+        }
+
+        function getResultsContainer() {
+            let container = document.getElementById('activity-results');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'activity-results';
+                container.className = 'results-container';
+                // Insert after search box
+                const searchBox = document.querySelector('.search-box');
+                searchBox.parentElement.insertBefore(container, searchBox.nextSibling);
+            }
+            return container;
+        }
+
+        function renderActivities(activities, location) {
+            const container = getResultsContainer();
+            container.innerHTML = `
+                <div class="results-summary" style="margin-bottom: 1rem;">
+                    <span><i class="fa-solid fa-ticket"></i> <strong>${activities.length} Aktivitaeten</strong> in ${escapeHTML(location)}</span>
+                </div>
+            ` + activities.map(activity => `
+                <div class="hotel-card" style="cursor:pointer">
+                    <div class="hotel-image" style="display:flex;align-items:center;justify-content:center;min-height:180px;background:rgba(90,200,250,0.05);">
+                        <i class="${activity.icon}" style="font-size:3rem;color:var(--accent);"></i>
+                    </div>
+                    <div class="hotel-info">
+                        <div class="hotel-header">
+                            <h3 class="hotel-name">${escapeHTML(activity.name)}</h3>
+                        </div>
+                        <div class="hotel-location">
+                            <i class="fa-solid fa-clock"></i>
+                            <span>${escapeHTML(activity.duration)}</span>
+                        </div>
+                        <div class="hotel-rating">
+                            <span class="rating-score">${activity.rating}</span>
+                            <span class="rating-text">${activity.rating >= 4.5 ? 'Hervorragend' : 'Sehr gut'}</span>
+                            <span class="rating-count">(${activity.reviews.toLocaleString('de-DE')} Bewertungen)</span>
+                        </div>
+                        <div class="hotel-amenities">
+                            ${activity.features.map(f => `<span class="amenity"><i class="fa-solid fa-check"></i> ${escapeHTML(f)}</span>`).join('')}
+                        </div>
+                        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.5rem;">${escapeHTML(activity.description)}</p>
+                    </div>
+                    <div class="hotel-price">
+                        <div class="price-info">
+                            <span class="price-per-night">${activity.price} EUR</span>
+                            <span class="price-label">pro Person</span>
+                        </div>
+                        <div class="price-total">
+                            <span>Gesamt: <strong>${activity.price * (activity.adjustedParticipants || 1)} EUR</strong></span>
+                            <span class="nights-info">${activity.adjustedParticipants || 1} Person(en)</span>
+                        </div>
+                        <button class="select-btn" onclick="event.stopPropagation(); bookActivity(${activity.id})">
+                            <i class="fa-solid fa-cart-plus"></i> Zum Warenkorb
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function bookActivity(activityId) {
+            const activity = currentActivities.find(a => a.id === activityId);
+            if (!activity) return;
+
+            const participants = parseInt(document.getElementById('participants').value) || 1;
+            const activityDate = document.getElementById('activity-date').value;
+            const totalPrice = activity.price * participants;
+
+            // Add to cart via backend API (addToCart from flyai-shared.js)
+            addToCart('activity', {
+                name: activity.name,
+                description: activity.description,
+                duration: activity.duration,
+                date: activityDate,
+                participants: participants,
+                pricePerPerson: activity.price
+            }, totalPrice, 'EUR');
         }
 
         function selectCategory(category) {
             document.getElementById('category').value = category;
-            showToast('Aktivitäten-Suche wird bald verfügbar sein!', 'info');
+            // If location is filled, auto-search
+            const location = document.getElementById('activity-location').value.trim();
+            if (location) {
+                searchActivities();
+            } else {
+                showToast('Gib zuerst ein Reiseziel ein, dann suche Aktivitaeten!', 'info');
+                document.getElementById('activity-location').focus();
+            }
         }
     </script>
 </body>

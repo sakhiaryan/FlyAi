@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FlyAI - Finde die besten Flugdeals mit KI-gestützter Suche. Vergleiche tausende Flüge in Sekunden.">
+    <meta name="theme-color" content="#0a0a0f">
     <title>FlyAI - KI-gestützte Flugsuche</title>
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
+    <link rel="stylesheet" href="style.css?v=10">
     <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -44,21 +47,21 @@
                 </a>
             </nav>
             <div class="header-actions">
-                <button class="btn-cart" onclick="toggleCart()">
+                <button class="btn-cart" onclick="toggleCart()" aria-label="Warenkorb öffnen">
                     <i class="fa-solid fa-shopping-cart"></i>
                     <span class="cart-badge" id="cart-badge">0</span>
                 </button>
-                <button class="btn-lang">
+                <button class="btn-lang" aria-label="Sprache wechseln">
                     <span class="flag">🇩🇪</span>
                     <span>DE</span>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
-                <button class="btn-login">
+                <button class="btn-login" aria-label="Anmelden">
                     <i class="fa-solid fa-user"></i>
                     <span>Anmelden</span>
                 </button>
             </div>
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menü öffnen">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
@@ -74,7 +77,7 @@
                 </div>
                 <span class="logo-text">Fly<span class="logo-highlight">AI</span></span>
             </div>
-            <button class="mobile-nav-close" onclick="toggleMobileMenu()">
+            <button class="mobile-nav-close" onclick="toggleMobileMenu()" aria-label="Menü schließen">
                 <i class="fa-solid fa-times"></i>
             </button>
         </div>
@@ -134,6 +137,26 @@
         </div>
     </section>
 
+    <!-- Trust Bar (Booking.com / Expedia style) -->
+    <div class="trust-bar">
+        <div class="trust-item">
+            <i class="fa-solid fa-check-circle"></i>
+            <span><span class="trust-number">500+</span> Airlines verglichen</span>
+        </div>
+        <div class="trust-item">
+            <i class="fa-solid fa-users"></i>
+            <span><span class="trust-number">2M+</span> zufriedene Nutzer</span>
+        </div>
+        <div class="trust-item">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Sichere Buchung</span>
+        </div>
+        <div class="trust-item">
+            <i class="fa-solid fa-headset"></i>
+            <span>24/7 Support</span>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="main-container">
 
@@ -159,6 +182,14 @@
                     </button>
                 </div>
 
+                <!-- Cabin Class Selector (Google Flights style) -->
+                <div class="cabin-class-selector">
+                    <button class="cabin-class-btn active" onclick="setCabinClass(this, 'economy')">Economy</button>
+                    <button class="cabin-class-btn" onclick="setCabinClass(this, 'premium')">Premium Economy</button>
+                    <button class="cabin-class-btn" onclick="setCabinClass(this, 'business')">Business</button>
+                    <button class="cabin-class-btn" onclick="setCabinClass(this, 'first')">First Class</button>
+                </div>
+
                 <div class="search-fields">
                     <div class="field-row">
                         <div class="field-group field-from">
@@ -170,7 +201,7 @@
                             <div id="from-dropdown" class="airport-dropdown"></div>
                         </div>
 
-                        <button class="swap-btn" onclick="swapAirports()" title="Flughäfen tauschen">
+                        <button class="swap-btn" onclick="swapAirports()" title="Flughäfen tauschen" aria-label="Flughäfen tauschen">
                             <i class="fa-solid fa-right-left"></i>
                         </button>
 
@@ -259,15 +290,61 @@
                 </button>
             </div>
 
-            <!-- Loading -->
-            <div id="loading" class="loading" style="display: none;">
-                <div class="loading-content">
-                    <div class="plane-animation">
-                        <i class="fa-solid fa-plane"></i>
+            <!-- Loading — Skeleton Loading (Booking.com style) -->
+            <div id="loading" style="display: none;">
+                <div class="search-progress">
+                    <div class="progress-steps">
+                        <div class="step active" id="step-search">
+                            <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span>Suche</span>
+                        </div>
+                        <div class="step" id="step-compare">
+                            <div class="step-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                            <span>Vergleiche</span>
+                        </div>
+                        <div class="step" id="step-results">
+                            <div class="step-icon"><i class="fa-solid fa-check"></i></div>
+                            <span>Ergebnisse</span>
+                        </div>
                     </div>
-                    <p>Suche die besten Flüge für dich...</p>
-                    <div class="loading-bar">
-                        <div class="loading-progress"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 10%"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text">Durchsuche 500+ Airlines...</p>
+                </div>
+                <div class="skeleton-container">
+                    <div class="skeleton-card">
+                        <div style="flex:1">
+                            <div class="sk-airline"><div class="sk-logo"></div><div class="sk-text sk-text-md"></div></div>
+                            <div class="sk-times">
+                                <div class="sk-time-block"><div class="sk-time"></div><div class="sk-airport"></div></div>
+                                <div class="sk-line-block"><div class="sk-duration"></div><div class="sk-line"></div><div class="sk-stops"></div></div>
+                                <div class="sk-time-block"><div class="sk-time"></div><div class="sk-airport"></div></div>
+                            </div>
+                        </div>
+                        <div class="sk-price-block"><div class="sk-price"></div><div class="sk-price-note"></div><div class="sk-btn"></div></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="flex:1">
+                            <div class="sk-airline"><div class="sk-logo"></div><div class="sk-text sk-text-lg"></div></div>
+                            <div class="sk-times">
+                                <div class="sk-time-block"><div class="sk-time"></div><div class="sk-airport"></div></div>
+                                <div class="sk-line-block"><div class="sk-duration"></div><div class="sk-line"></div><div class="sk-stops"></div></div>
+                                <div class="sk-time-block"><div class="sk-time"></div><div class="sk-airport"></div></div>
+                            </div>
+                        </div>
+                        <div class="sk-price-block"><div class="sk-price"></div><div class="sk-price-note"></div><div class="sk-btn"></div></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div style="flex:1">
+                            <div class="sk-airline"><div class="sk-logo"></div><div class="sk-text sk-text-sm"></div></div>
+                            <div class="sk-times">
+                                <div class="sk-time-block"><div class="sk-time"></div><div class="sk-airport"></div></div>
+                                <div class="sk-line-block"><div class="sk-duration"></div><div class="sk-line"></div><div class="sk-stops"></div></div>
+                                <div class="sk-time-block"><div class="sk-time"></div><div class="sk-airport"></div></div>
+                            </div>
+                        </div>
+                        <div class="sk-price-block"><div class="sk-price"></div><div class="sk-price-note"></div><div class="sk-btn"></div></div>
                     </div>
                 </div>
             </div>
@@ -373,8 +450,87 @@
                 </div>
             </div>
 
+            <!-- Results Summary (Google Flights style) -->
+            <div id="results-summary" class="results-summary" style="display: none;">
+                <div class="results-count">
+                    <strong id="results-count-num">0</strong> Flüge gefunden
+                </div>
+                <div class="results-price-range">
+                    <span class="price-label-sm">ab</span>
+                    <span class="from-price" id="results-min-price">--</span>
+                </div>
+            </div>
+
+            <!-- Quick Filter Chips (Skyscanner / Kayak style) -->
+            <div id="quick-filters" class="quick-filters" style="display: none;">
+                <button class="quick-filter-chip" onclick="quickFilterDirect()">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    Nur Direkt
+                </button>
+                <button class="quick-filter-chip" onclick="quickFilterCheapest()">
+                    <i class="fa-solid fa-tag"></i>
+                    Guenstigster
+                    <span class="chip-price" id="cheapest-chip-price"></span>
+                </button>
+                <button class="quick-filter-chip" onclick="quickFilterFastest()">
+                    <i class="fa-solid fa-bolt"></i>
+                    Schnellster
+                </button>
+                <button class="quick-filter-chip" onclick="quickFilterMorning()">
+                    <i class="fa-solid fa-sun"></i>
+                    Morgenflug
+                </button>
+                <button class="quick-filter-chip" onclick="quickFilterEvening()">
+                    <i class="fa-solid fa-moon"></i>
+                    Abendflug
+                </button>
+            </div>
+
             <!-- Results -->
             <div id="results" class="results"></div>
+
+            <!-- Popular Destinations (shown before first search) -->
+            <div id="popular-destinations" class="popular-destinations">
+                <h3><i class="fa-solid fa-fire"></i> Beliebte Reiseziele</h3>
+                <div class="destinations-grid">
+                    <div class="destination-card" onclick="setDestination('Barcelona', 'BCN')">
+                        <span class="destination-emoji">&#127466;&#127480;</span>
+                        <span class="destination-city">Barcelona</span>
+                        <span class="destination-country">Spanien</span>
+                        <span class="destination-price">ab 49 EUR <span>Hin</span></span>
+                    </div>
+                    <div class="destination-card" onclick="setDestination('London', 'LHR')">
+                        <span class="destination-emoji">&#127468;&#127463;</span>
+                        <span class="destination-city">London</span>
+                        <span class="destination-country">Vereinigtes Koenigreich</span>
+                        <span class="destination-price">ab 39 EUR <span>Hin</span></span>
+                    </div>
+                    <div class="destination-card" onclick="setDestination('Paris', 'CDG')">
+                        <span class="destination-emoji">&#127467;&#127479;</span>
+                        <span class="destination-city">Paris</span>
+                        <span class="destination-country">Frankreich</span>
+                        <span class="destination-price">ab 55 EUR <span>Hin</span></span>
+                    </div>
+                    <div class="destination-card" onclick="setDestination('Rom', 'FCO')">
+                        <span class="destination-emoji">&#127470;&#127481;</span>
+                        <span class="destination-city">Rom</span>
+                        <span class="destination-country">Italien</span>
+                        <span class="destination-price">ab 45 EUR <span>Hin</span></span>
+                    </div>
+                    <div class="destination-card" onclick="setDestination('Amsterdam', 'AMS')">
+                        <span class="destination-emoji">&#127475;&#127473;</span>
+                        <span class="destination-city">Amsterdam</span>
+                        <span class="destination-country">Niederlande</span>
+                        <span class="destination-price">ab 42 EUR <span>Hin</span></span>
+                    </div>
+                    <div class="destination-card" onclick="setDestination('Istanbul', 'IST')">
+                        <span class="destination-emoji">&#127481;&#127479;</span>
+                        <span class="destination-city">Istanbul</span>
+                        <span class="destination-country">Tuerkei</span>
+                        <span class="destination-price">ab 69 EUR <span>Hin</span></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Right: AI Chat Sidebar -->
@@ -404,7 +560,7 @@
             <div id="chat-messages" class="chat-messages"></div>
             <div class="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Schreibe eine Nachricht..." onkeypress="handleChatEnter(event)">
-                <button onclick="sendChat()" class="chat-send-btn">
+                <button onclick="sendChat()" class="chat-send-btn" aria-label="Nachricht senden">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
@@ -431,9 +587,9 @@
                 <a href="#">Kontakt</a>
             </div>
             <div class="footer-social">
-                <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#" class="social-link" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="social-link" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -445,7 +601,7 @@
     <div id="cart-sidebar" class="cart-sidebar">
         <div class="cart-sidebar-header">
             <h3><i class="fa-solid fa-shopping-cart"></i> Dein Warenkorb</h3>
-            <button class="cart-close-btn" onclick="toggleCart()"><i class="fa-solid fa-times"></i></button>
+            <button class="cart-close-btn" onclick="toggleCart()" aria-label="Warenkorb schließen"><i class="fa-solid fa-times"></i></button>
         </div>
         <div id="cart-items" class="cart-items">
             <div class="cart-empty">
@@ -466,6 +622,6 @@
     </div>
     <div id="cart-overlay" class="cart-overlay" onclick="toggleCart()"></div>
 
-    <script src="app.js?v=19"></script>
+    <script src="app.js?v=20"></script>
 </body>
 </html>

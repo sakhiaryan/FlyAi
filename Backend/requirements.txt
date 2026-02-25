@@ -7,3 +7,5 @@ sqlmodel
 slowapi
 httpx
 beautifulsoup4
+passlib[bcrypt]
+bleach

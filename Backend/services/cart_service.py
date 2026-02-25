@@ -203,7 +203,7 @@ def format_cart_for_chat(engine, session_id: str) -> str:
         parts.append("\n🏨 **Hotels:**")
         for hotel in summary["hotels"]:
             data = hotel["data"]
-            parts.append(f"   • {data.get('name', 'Hotel')}: {flight['price']} {hotel['currency']}")
+            parts.append(f"   • {data.get('name', 'Hotel')}: {hotel['price']} {hotel['currency']}")
 
     # Aktivitäten
     if summary["activities"]:
